@@ -3,10 +3,11 @@ package cj.netos.fsbank.stub;
 import java.util.ArrayList;
 import java.util.List;
 
+import cj.netos.fsbank.args.BankCompany;
 import cj.netos.fsbank.args.BankInfo;
 import cj.netos.fsbank.args.BankLicense;
 import cj.netos.fsbank.args.BankPresident;
-import cj.netos.fsbank.args.SeparateBillRuler;
+import cj.studio.ecm.net.CircuitException;
 import cj.studio.gateway.stub.annotation.CjStubInContentKey;
 import cj.studio.gateway.stub.annotation.CjStubInParameter;
 import cj.studio.gateway.stub.annotation.CjStubMethod;
@@ -15,13 +16,24 @@ import cj.studio.gateway.stub.annotation.CjStubService;
 
 @CjStubService(bindService = "/manager.service", usage = "金证银行管理服务")
 public interface IFSBankManagerStub {
-	@CjStubMethod(command = "post", usage = "银行注册信息")
-	BankLicense registerBank(@CjStubInContentKey(key = "president", usage = "银行行长") BankPresident president,
-			@CjStubInParameter(key = "validTerm", usage = "有效期") long validTerm,
-			@CjStubInContentKey(key = "ruler", usage = "拆单规则，一个银行的拆单规则一旦设定下来就永久不能变") SeparateBillRuler ruler);
+	@CjStubMethod(command = "post", usage = "注册银行，该方法仅是创建银行主体信息，稍后要调用其它方法以完善资料")
+	@CjStubReturn(usage = "返回行号")
+	String registerBank(@CjStubInContentKey(key = "info", usage = "银行信息，json") BankInfo info) throws CircuitException;
+
+	@CjStubMethod(command = "post", usage = "设置行长")
+	void setPresident(@CjStubInContentKey(key = "president", usage = "行长信息，json") BankPresident president)
+			throws CircuitException;
+
+	@CjStubMethod(command = "post", usage = "设置公司信息")
+	void setCompany(@CjStubInContentKey(key = "company", usage = "公司信息，json") BankCompany company)
+			throws CircuitException;
+
+	@CjStubMethod(usage = "验证银行资料的完整性。如缺少拥有者信息资料、缺少拆单规则等")
+	void verifyBankIntegrity(@CjStubInParameter(key = "bankCode", usage = "银行代码") String bankCode)
+			throws CircuitException;
 
 	@CjStubMethod(usage = "吊销指定的银行，吊销并不是删除，只是改变状态为吊销")
-	void unregisterBank(@CjStubInParameter(key = "bankCode", usage = "银行代码") String bankCode);
+	void deregisterBank(@CjStubInParameter(key = "bankCode", usage = "银行代码") String bankCode) throws CircuitException;
 
 	@CjStubMethod(usage = "冻结指定的银行")
 	void freezeBank(@CjStubInParameter(key = "bankCode", usage = "银行代码") String bankCode);

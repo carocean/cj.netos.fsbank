@@ -14,9 +14,18 @@ import cj.studio.util.reactor.IReactor;
 public class FSBankTransactionStub extends GatewayAppSiteRestStub implements IFSBankTransactionStub {
 	@CjServiceSite
 	IServiceSite site;
+	IReactor reactor;
+	
+	protected IReactor getReactor() {
+		if(reactor==null) {
+			reactor = (IReactor) site.getService("$.reactor"); 
+		}
+		return reactor;
+	}
+	
 	@Override
 	public void deposit(String bank,DepositBill bill) {
-		IReactor reactor = (IReactor) site.getService("$.reactor");   
+		IReactor reactor =getReactor();   
 		Event e=new Event(bank, "deposit");
 		e.getParameters().put("bill", bill);
 		reactor.input(e);
@@ -24,7 +33,7 @@ public class FSBankTransactionStub extends GatewayAppSiteRestStub implements IFS
 
 	@Override
 	public void cashout(String bank,CashoutBill bill) {
-		IReactor reactor = (IReactor) site.getService("$.reactor");
+		IReactor reactor = getReactor();
 		Event e=new Event(bank, "deposit");
 		e.getParameters().put("bill", bill);
 		reactor.input(e);
