@@ -1,0 +1,14 @@
+{
+	"valids": [
+		{
+			"name": "fsbank",
+			"uris": [
+				"app://fsbank:way"
+			],
+			"props": {
+				
+			}
+		}
+	],
+	"invalids": []
+}
