@@ -75,7 +75,7 @@ public class FSBankManagerStub extends GatewayAppSiteRestStub implements IFSBank
 					String.format("Bank with specified code %s does not exist", president.getBank()));
 		}
 		if (fSBankPresidentBS.hasPresidentOfBank(president.getBank())) {
-			throw new CircuitException("404",
+			throw new CircuitException("500",
 					String.format("president with specified president bank %s has existed", president.getBank()));
 		}
 		fSBankPresidentBS.savePresident(president);
@@ -99,7 +99,7 @@ public class FSBankManagerStub extends GatewayAppSiteRestStub implements IFSBank
 			throw new CircuitException("404", String.format("银行代码：%s 不存在", company.getBank()));
 		}
 		if (fSBankCompanyBS.hasCompanyOfBank(company.getBank())) {
-			throw new CircuitException("404", String.format("银行：%s 已存在企业", company.getBank()));
+			throw new CircuitException("500", String.format("银行：%s 已存在企业", company.getBank()));
 		}
 		fSBankCompanyBS.saveCompany(company);
 	}
@@ -128,7 +128,7 @@ public class FSBankManagerStub extends GatewayAppSiteRestStub implements IFSBank
 			throw new CircuitException("404", String.format("银行代码：%s 不存在", ruler.getBank()));
 		}
 		if (fSBankSeparateBillBS.hasRulerOfBank(ruler.getBank())) {
-			throw new CircuitException("404", String.format("银行：%s 已存在拆单规则", ruler.getBank()));
+			throw new CircuitException("500", String.format("银行：%s 已存在拆单规则", ruler.getBank()));
 		}
 		fSBankSeparateBillBS.saveRuler(ruler);
 	}
@@ -160,7 +160,10 @@ public class FSBankManagerStub extends GatewayAppSiteRestStub implements IFSBank
 		fSBankLicenseBS.saveLicense(presidentPwd, license);
 		return license.getCode();
 	}
-
+	@Override
+	public SeparateBillRuler geBankSeparateBilltRuler(String bank) {
+		return fSBankSeparateBillBS.getRuler(bank);
+	}
 	@Override
 	public void deregisterBank(String bankCode) {
 		fSBankInfoBS.deregisterBank(bankCode);

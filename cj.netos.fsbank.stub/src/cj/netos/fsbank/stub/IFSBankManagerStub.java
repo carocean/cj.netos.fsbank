@@ -36,7 +36,11 @@ public interface IFSBankManagerStub {
 			@CjStubInContentKey(key = "license", usage = "银行照片，json") BankLicense license) throws CircuitException;
 
 	@CjStubMethod(command = "post", usage = "设置拆单规则")
-	void setBankSeparateBillRule(@CjStubInContentKey(key = "ruler", usage = "规则，json") SeparateBillRuler ruler) throws CircuitException;
+	void setBankSeparateBillRule(@CjStubInContentKey(key = "ruler", usage = "规则，json") SeparateBillRuler ruler)
+			throws CircuitException;
+
+	@CjStubMethod(usage = "获取拆单规则")
+	SeparateBillRuler geBankSeparateBilltRuler(@CjStubInParameter(key = "bank", usage = "银行代码") String bank);
 
 	@CjStubMethod(usage = "吊销指定的银行，吊销并不是删除，只是改变状态为吊销")
 	void deregisterBank(@CjStubInParameter(key = "bankCode", usage = "银行代码") String bankCode) throws CircuitException;

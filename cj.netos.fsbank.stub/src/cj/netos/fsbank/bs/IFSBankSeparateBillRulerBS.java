@@ -9,4 +9,5 @@ public interface IFSBankSeparateBillRulerBS {
 
 	void saveRuler(SeparateBillRuler ruler);
 
+	SeparateBillRuler getRuler(String bank);
 }
