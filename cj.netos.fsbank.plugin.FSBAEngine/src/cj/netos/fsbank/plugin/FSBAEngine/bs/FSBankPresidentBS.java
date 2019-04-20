@@ -18,7 +18,7 @@ public class FSBankPresidentBS implements IFSBankPresidentBS {
 	}
 
 	@Override
-	public boolean existsPresident(String bank) {//一个银行一个行长
+	public boolean hasPresidentOfBank(String bank) {//一个银行一个行长
 		String where=String.format("{'tuple.bank':'%s'}", bank);
 		return home.tupleCount(TABLE_PRESIDENT, where)>0;
 	}
