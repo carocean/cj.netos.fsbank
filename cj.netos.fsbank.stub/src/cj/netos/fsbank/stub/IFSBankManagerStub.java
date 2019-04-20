@@ -40,7 +40,7 @@ public interface IFSBankManagerStub {
 			throws CircuitException;
 
 	@CjStubMethod(usage = "获取拆单规则")
-	SeparateBillRuler geBankSeparateBilltRuler(@CjStubInParameter(key = "bank", usage = "银行代码") String bank);
+	SeparateBillRuler getBankSeparateBilltRuler(@CjStubInParameter(key = "bank", usage = "银行代码") String bank);
 
 	@CjStubMethod(usage = "吊销指定的银行，吊销并不是删除，只是改变状态为吊销")
 	void deregisterBank(@CjStubInParameter(key = "bankCode", usage = "银行代码") String bankCode) throws CircuitException;

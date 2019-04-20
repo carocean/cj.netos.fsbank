@@ -161,7 +161,7 @@ public class FSBankManagerStub extends GatewayAppSiteRestStub implements IFSBank
 		return license.getCode();
 	}
 	@Override
-	public SeparateBillRuler geBankSeparateBilltRuler(String bank) {
+	public SeparateBillRuler getBankSeparateBilltRuler(String bank) {
 		return fSBankSeparateBillBS.getRuler(bank);
 	}
 	@Override
