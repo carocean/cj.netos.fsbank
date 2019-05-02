@@ -40,6 +40,7 @@ public class FSBankManagerStub extends GatewayAppSiteRestStub implements IFSBank
 
 	@CjServiceRef(refByName = "FSBAEngine.fSBankSeparateBillBS")
 	IFSBankSeparateBillRulerBS fSBankSeparateBillBS;
+
 	@Override
 	public String registerBank(BankInfo info) throws CircuitException {
 		if (StringUtil.isEmpty(info.getName())) {
@@ -109,20 +110,14 @@ public class FSBankManagerStub extends GatewayAppSiteRestStub implements IFSBank
 		if (StringUtil.isEmpty(ruler.getBank())) {
 			throw new CircuitException("404", String.format("未指定银行"));
 		}
-		if (ruler.getIssueBondRate() == null || new BigDecimal(0).compareTo(ruler.getIssueBondRate()) >= 0) {
+		if (ruler.getBondRate() == null || new BigDecimal(0).compareTo(ruler.getBondRate()) >= 0) {
 			throw new CircuitException("404", String.format("发债金率未指定"));
 		}
 		if (ruler.getReserveRate() == null || new BigDecimal(0).compareTo(ruler.getReserveRate()) >= 0) {
 			throw new CircuitException("404", String.format("准备金率未指定"));
 		}
 		if (ruler.getFreeMRate() == null || new BigDecimal(0).compareTo(ruler.getFreeMRate()) >= 0) {
-			ruler.setFreeMRate(new BigDecimal(1).subtract(ruler.getIssueBondRate().add(ruler.getReserveRate())));
-		}
-		if(ruler.getFreeMRules().isEmpty()) {
-			throw new CircuitException("404", String.format("自由金分配规则为空"));
-		}
-		if(ruler.totalFreeMRuleRate()!=1.0) {
-			throw new CircuitException("404", String.format("自由金分配规则总为不为1"));
+			ruler.setFreeMRate(new BigDecimal(1).subtract(ruler.getBondRate().add(ruler.getReserveRate())));
 		}
 		if (!fSBankInfoBS.existsBankCode(ruler.getBank())) {
 			throw new CircuitException("404", String.format("银行代码：%s 不存在", ruler.getBank()));
@@ -160,10 +155,12 @@ public class FSBankManagerStub extends GatewayAppSiteRestStub implements IFSBank
 		fSBankLicenseBS.saveLicense(presidentPwd, license);
 		return license.getCode();
 	}
+
 	@Override
 	public SeparateBillRuler getBankSeparateBilltRuler(String bank) {
 		return fSBankSeparateBillBS.getRuler(bank);
 	}
+
 	@Override
 	public void deregisterBank(String bankCode) {
 		fSBankInfoBS.deregisterBank(bankCode);

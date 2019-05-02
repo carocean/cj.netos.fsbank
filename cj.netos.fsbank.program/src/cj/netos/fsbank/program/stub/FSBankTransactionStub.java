@@ -1,7 +1,7 @@
 package cj.netos.fsbank.program.stub;
 
-import cj.netos.fsbank.args.CashoutBill;
-import cj.netos.fsbank.args.DepositBill;
+import java.math.BigDecimal;
+
 import cj.netos.fsbank.stub.IFSBankTransactionStub;
 import cj.studio.ecm.IServiceSite;
 import cj.studio.ecm.annotation.CjService;
@@ -15,30 +15,43 @@ public class FSBankTransactionStub extends GatewayAppSiteRestStub implements IFS
 	@CjServiceSite
 	IServiceSite site;
 	IReactor reactor;
-	
+
 	protected IReactor getReactor() {
-		if(reactor==null) {
-			reactor = (IReactor) site.getService("$.reactor"); 
+		if (reactor == null) {
+			reactor = (IReactor) site.getService("$.reactor");
 		}
 		return reactor;
 	}
-	
-	@Override
-	public void deposit(String bank,DepositBill bill) {
-		IReactor reactor =getReactor();   
-		Event e=new Event(bank, "deposit");
-		e.getParameters().put("bill", bill);
-		reactor.input(e);
-	}
 
 	@Override
-	public void cashout(String bank,CashoutBill bill) {
+	public void deposit(String bank, String depositor, String currency, BigDecimal amount) {
 		IReactor reactor = getReactor();
-		Event e=new Event(bank, "deposit");
-		e.getParameters().put("bill", bill);
+		Event e = new Event(bank, "deposit");
+		e.getParameters().put("depositor", depositor);
+		e.getParameters().put("currency", currency);
+		e.getParameters().put("amount", amount);
 		reactor.input(e);
 	}
 
+	@Override
+	public void cashout(String bank,String balanceType,  String cashoutor, String identity, BigDecimal reqAmount,String memo) {
+		IReactor reactor = getReactor();
+		Event e = new Event(bank, "cashout");
+		e.getParameters().put("cashoutor", cashoutor);
+		e.getParameters().put("reqAmount", reqAmount);
+		e.getParameters().put("identity", identity);
+		e.getParameters().put("memo",memo);
+		e.getParameters().put("balanceType",balanceType);
+		reactor.input(e);
+	}
 
+	@Override
+	public void exchange(String bank, String exchanger,BigDecimal bondQuantities) {
+		IReactor reactor = getReactor();
+		Event e = new Event(bank, "exchange");
+		e.getParameters().put("exchanger", exchanger);
+		e.getParameters().put("bondQuantities", bondQuantities);
+		reactor.input(e);
+	}
 
 }

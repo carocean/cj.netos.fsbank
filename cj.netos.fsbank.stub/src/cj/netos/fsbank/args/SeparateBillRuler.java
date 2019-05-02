@@ -1,20 +1,21 @@
 package cj.netos.fsbank.args;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
 
 public class SeparateBillRuler {
-	BigDecimal issueBondRate;
+	BigDecimal bondRate;
 	BigDecimal reserveRate;
-	BigDecimal freeMRate;// 自由金率等于rules内各个收益分配率之和
+	BigDecimal freeMRate;
 	String bank;// 一个银行有且仅有一条拆单规则
-	List<FreeMSharingRule> freeMRules;// 自由金规则总和
-
+	String bondKind;
 	public SeparateBillRuler() {
-		freeMRules = new ArrayList<>();
 	}
-
+	public String getBondKind() {
+		return bondKind;
+	}
+	public void setBondKind(String bondKind) {
+		this.bondKind = bondKind;
+	}
 	public String getBank() {
 		return bank;
 	}
@@ -23,12 +24,12 @@ public class SeparateBillRuler {
 		this.bank = bank;
 	}
 
-	public BigDecimal getIssueBondRate() {
-		return issueBondRate;
+	public BigDecimal getBondRate() {
+		return bondRate;
 	}
 
-	public void setIssueBondRate(BigDecimal issueBondRate) {
-		this.issueBondRate = issueBondRate;
+	public void setBondRate(BigDecimal bondRate) {
+		this.bondRate = bondRate;
 	}
 
 	public BigDecimal getReserveRate() {
@@ -47,15 +48,4 @@ public class SeparateBillRuler {
 		this.freeMRate = freeMRate;
 	}
 
-	public List<FreeMSharingRule> getFreeMRules() {
-		return freeMRules;
-	}
-
-	public double totalFreeMRuleRate() {
-		BigDecimal total = new BigDecimal(0.0);
-		for (FreeMSharingRule r : freeMRules) {
-			total=total.add(r.getRate());
-		}
-		return total.doubleValue();
-	}
 }

@@ -3,6 +3,8 @@ package cj.netos.fsbank.plugin.FSBAEngine.bs;
 import java.util.List;
 
 import cj.lns.chip.sos.cube.framework.ICube;
+import cj.lns.chip.sos.cube.framework.IDocument;
+import cj.lns.chip.sos.cube.framework.IQuery;
 import cj.lns.chip.sos.cube.framework.TupleDocument;
 import cj.netos.fsbank.args.BankInfo;
 import cj.netos.fsbank.args.BankLicense;
@@ -17,8 +19,8 @@ public class FSBankInfoBS implements IFSBankInfoBS {
 
 	@Override
 	public boolean existsBankName(String name) {
-		String where=String.format("{'tuple.name':'%s'}", name);
-		return home.tupleCount(TABLE_BANK_INFO, where)>0;
+		String where = String.format("{'tuple.name':'%s'}", name);
+		return home.tupleCount(TABLE_BANK_INFO, where) > 0;
 	}
 
 	@Override
@@ -27,11 +29,13 @@ public class FSBankInfoBS implements IFSBankInfoBS {
 		String id = home.saveDoc(TABLE_BANK_INFO, new TupleDocument<>(info));
 		info.setCode(id);
 	}
+
 	@Override
 	public boolean existsBankCode(String bank) {
-		String where=String.format("{'_id':ObjectId('%s')}", bank);
-		return home.tupleCount(TABLE_BANK_INFO, where)>0;
+		String where = String.format("{'_id':ObjectId('%s')}", bank);
+		return home.tupleCount(TABLE_BANK_INFO, where) > 0;
 	}
+
 	@Override
 	public void deregisterBank(String bankCode) {
 		// TODO Auto-generated method stub
@@ -58,8 +62,14 @@ public class FSBankInfoBS implements IFSBankInfoBS {
 
 	@Override
 	public BankInfo getBankInfo(String bankCode) {
-		// TODO Auto-generated method stub
-		return null;
+		String cjql = String.format("select {'tuple':'*'} from tuple %s %s where {'_id':ObjectId('%s')}", TABLE_BANK_INFO,
+				BankInfo.class.getName(),bankCode);
+		IQuery<BankInfo> q = home.createQuery(cjql);
+		IDocument<BankInfo> doc = q.getSingleResult();
+		if (doc == null)
+			return null;
+		doc.tuple().setCode(doc.docid());
+		return doc.tuple();
 	}
 
 	@Override
