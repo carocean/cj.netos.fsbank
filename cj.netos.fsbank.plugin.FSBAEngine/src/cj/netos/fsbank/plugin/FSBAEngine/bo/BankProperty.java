@@ -8,7 +8,7 @@ public class BankProperty {
 	public final static transient String CONSTANS_KEY_bigDecimal_scale = "bigDecimal.scale";
 	public final static transient String CONSTANS_KEY_bigDecimal_roundingMode = "bigDecimal.roundingMode";
 	public final static transient String CONSTANS_KEY_Rule_bondRate = "rule.bondRate";
-	public final static transient String CONSTANS_KEY_Rule_freeRate = "rule.freeMRate";
+	public final static transient String CONSTANS_KEY_Rule_freeRate = "rule.freeRate";
 	public final static transient String CONSTANS_KEY_Rule_reserveRate = "rule.reserveRate";
 	String key;
 	String value;
