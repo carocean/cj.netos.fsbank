@@ -5,7 +5,6 @@ import java.math.BigDecimal;
 public class DepositBill {
 	String code;
 	String depositor;
-	String currency;
 	BigDecimal amount;
 	BigDecimal currBondPrice;
 	BigDecimal newBondPrice;
@@ -26,12 +25,6 @@ public class DepositBill {
 	}
 	public void setDepositor(String depositor) {
 		this.depositor = depositor;
-	}
-	public String getCurrency() {
-		return currency;
-	}
-	public void setCurrency(String currency) {
-		this.currency = currency;
 	}
 	public BigDecimal getAmount() {
 		return amount;

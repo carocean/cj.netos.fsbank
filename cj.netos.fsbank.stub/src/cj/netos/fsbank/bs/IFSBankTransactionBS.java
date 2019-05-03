@@ -2,13 +2,11 @@ package cj.netos.fsbank.bs;
 
 import java.math.BigDecimal;
 
-import cj.netos.fsbank.args.SeparateBillRuler;
-
 public interface IFSBankTransactionBS {
 	static String TABLE_Deposits = "deposits";
 	static String TABLE_Cashouts = "cashouts";
 	static String TABLE_Exchanges = "exchanges";
-	void separateBill(String bank, String depositor, String currency, BigDecimal amount, SeparateBillRuler ruler);
+	void depositBill(String bank, String depositor, BigDecimal amount);
 
 	void cashoutBill(String bank,String balanceType, String cashoutor, String identity, BigDecimal reqAmount, String memo);
 

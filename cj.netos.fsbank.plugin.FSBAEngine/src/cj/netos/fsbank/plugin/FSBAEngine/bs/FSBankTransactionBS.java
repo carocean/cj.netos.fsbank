@@ -9,7 +9,6 @@ import cj.lns.chip.sos.cube.framework.TupleDocument;
 import cj.netos.fsbank.args.CashoutBill;
 import cj.netos.fsbank.args.DepositBill;
 import cj.netos.fsbank.args.ExchangeBill;
-import cj.netos.fsbank.args.SeparateBillRuler;
 import cj.netos.fsbank.args.SepareteBill;
 import cj.netos.fsbank.bs.IFSBankBalanceBS;
 import cj.netos.fsbank.bs.IFSBankPropertiesBS;
@@ -24,7 +23,7 @@ import cj.studio.ecm.annotation.CjServiceSite;
 import cj.ultimate.util.StringUtil;
 
 @CjService(name = "fSBankTransactionBS")
-public class FSBankTransactionBS implements IFSBankTransactionBS {
+public class FSBankTransactionBS implements IFSBankTransactionBS, BigDecimalConstants {
 	@CjServiceSite
 	IServiceSite site;
 	@CjServiceRef
@@ -42,22 +41,16 @@ public class FSBankTransactionBS implements IFSBankTransactionBS {
 	}
 
 	@Override
-	public void separateBill(String bank, String depositor, String currency, BigDecimal amount,
-			SeparateBillRuler ruler) {
+	public void depositBill(String bank, String depositor,  BigDecimal amount) {
 		DepositBill bill = new DepositBill();
 		bill.setAmount(amount);
-		if (StringUtil.isEmpty(currency)) {
-			currency = "CNY";
-		}
-		bill.setCurrency(currency);
 		bill.setDepositor(depositor);
 		bill.setCode(null);
 		bill.setDtime(System.currentTimeMillis());
 
 		BigDecimal bondPrice = fSBankBalance.getBondPrice(bank);
 		if (bondPrice == null) {
-			bondPrice = new BigDecimal(0.001,
-					new MathContext(BigDecimalConstants.setPrecision, BigDecimalConstants.roundingMode_forNewDecimal));
+			bondPrice = ultimateBondPrice(fSBankPropertiesBS, bank);
 			bill.setCurrBondPrice(bondPrice);
 		} else {
 			bill.setCurrBondPrice(bondPrice);
@@ -66,20 +59,21 @@ public class FSBankTransactionBS implements IFSBankTransactionBS {
 		// 拆单:如果全部已提现，则帑价不变而不是以0.001开始
 		SepareteBill sbill = new SepareteBill();
 		bill.setSepareteBill(sbill);
+		BigDecimal bondRate=bondRate(fSBankPropertiesBS, bank);
+		BigDecimal freeRate=freeRate(fSBankPropertiesBS, bank);
+		BigDecimal reserveRate=reserveRate(fSBankPropertiesBS, bank);
+		sbill.setBondRate(bondRate);
+		sbill.setFreeMRate(freeRate);
+		sbill.setReserveRate(reserveRate);
 
-		sbill.setBondRate(ruler.getBondRate());
-		sbill.setFreeMRate(ruler.getFreeMRate());
-		sbill.setReserveRate(ruler.getReserveRate());
-		sbill.setBondKind(ruler.getBondKind());
-
-		sbill.setBondAmount(amount.multiply(ruler.getBondRate()));
-		BigDecimal bondQuantities = sbill.getBondAmount().divide(bill.getCurrBondPrice(), BigDecimalConstants.scale,
-				BigDecimalConstants.roundingMode);
+		sbill.setBondAmount(amount.multiply(bondRate(fSBankPropertiesBS, bank)));
+		BigDecimal bondQuantities = sbill.getBondAmount().divide(bill.getCurrBondPrice(),
+				new MathContext(BigDecimalConstants.scale, BigDecimalConstants.roundingMode));
 		sbill.setBondQuantities(bondQuantities);
 
-		sbill.setReserveAmount(amount.multiply(ruler.getReserveRate()));
+		sbill.setReserveAmount(amount.multiply(reserveRate));
 
-		sbill.setFreeMAmount(amount.multiply(ruler.getFreeMRate()));
+		sbill.setFreeMAmount(amount.multiply(freeRate));
 
 		bill.setTailAmount(amount.subtract(sbill.getBondAmount()).subtract(sbill.getReserveAmount())
 				.subtract(sbill.getFreeMAmount()));
@@ -87,26 +81,26 @@ public class FSBankTransactionBS implements IFSBankTransactionBS {
 		BigDecimal tailAmountBalance = fSBankBalance.getTailAmountBalance(bank);
 		if (tailAmountBalance == null) {
 			tailAmountBalance = new BigDecimal(0.0,
-					new MathContext(BigDecimalConstants.setPrecision, BigDecimalConstants.roundingMode_forNewDecimal));
+					new MathContext(BigDecimalConstants.scale, BigDecimalConstants.roundingMode));
 		}
 		tailAmountBalance = tailAmountBalance.add(bill.getTailAmount());
 
 		BigDecimal freeAmountBalance = fSBankBalance.getFreeAmountBalance(bank);
 		if (freeAmountBalance == null) {
 			freeAmountBalance = new BigDecimal(0.0,
-					new MathContext(BigDecimalConstants.setPrecision, BigDecimalConstants.roundingMode_forNewDecimal));
+					new MathContext(BigDecimalConstants.scale, BigDecimalConstants.roundingMode));
 		}
 		freeAmountBalance = freeAmountBalance.add(sbill.getFreeMAmount());
 
 		BigDecimal bondAmountBalance = fSBankBalance.getBondAmountBalance(bank);
 		if (bondAmountBalance == null) {
 			bondAmountBalance = new BigDecimal(0.0,
-					new MathContext(BigDecimalConstants.setPrecision, BigDecimalConstants.roundingMode_forNewDecimal));
+					new MathContext(BigDecimalConstants.scale, BigDecimalConstants.roundingMode));
 		}
 		BigDecimal reserveAmountBalance = fSBankBalance.getReserveAmountBalance(bank);
 		if (reserveAmountBalance == null) {
 			reserveAmountBalance = new BigDecimal(0.0,
-					new MathContext(BigDecimalConstants.setPrecision, BigDecimalConstants.roundingMode_forNewDecimal));
+					new MathContext(BigDecimalConstants.scale, BigDecimalConstants.roundingMode));
 		}
 		BigDecimal storedAmountBalance = bondAmountBalance.add(reserveAmountBalance).add(sbill.getBondAmount())
 				.add(sbill.getReserveAmount());
@@ -114,13 +108,13 @@ public class FSBankTransactionBS implements IFSBankTransactionBS {
 		BigDecimal bondQuantitiesBalance = fSBankBalance.getBondQuantitiesBalance(bank);
 		if (bondQuantitiesBalance == null) {
 			bondQuantitiesBalance = new BigDecimal(0.0,
-					new MathContext(BigDecimalConstants.setPrecision, BigDecimalConstants.roundingMode_forNewDecimal));
+					new MathContext(BigDecimalConstants.scale, BigDecimalConstants.roundingMode));
 		}
 
 		bondQuantitiesBalance = bondQuantitiesBalance.add(sbill.getBondQuantities());
 
-		BigDecimal newBondPrice = storedAmountBalance.divide(bondQuantitiesBalance, BigDecimalConstants.scale,
-				BigDecimalConstants.roundingMode);
+		BigDecimal newBondPrice = storedAmountBalance.divide(bondQuantitiesBalance,
+				new MathContext(BigDecimalConstants.scale, BigDecimalConstants.roundingMode));
 		bill.setNewBondPrice(newBondPrice);
 		fSBankBalance.updateBondPrice(bank, newBondPrice);
 		fSBankBalance.updateBondAmountBalance(bank, bondAmountBalance.add(sbill.getBondAmount()));
@@ -128,18 +122,6 @@ public class FSBankTransactionBS implements IFSBankTransactionBS {
 		fSBankBalance.updateBondQuantitiesBalance(bank, bondQuantitiesBalance);
 		fSBankBalance.updateTailAmountBalance(bank, tailAmountBalance);
 		fSBankBalance.updateFreeAmountBalance(bank, freeAmountBalance);
-		String bondKind = fSBankBalance.getBondKind(bank);
-		if (StringUtil.isEmpty(bondKind)) {
-			bondKind = ruler.getBondKind();
-			if (!StringUtil.isEmpty(bondKind)) {
-				sbill.setBondKind(bondKind);
-				fSBankBalance.updateBondKind(bank, bondKind);
-			}
-		}
-		String existscurrency = fSBankBalance.getCurrency(bank);
-		if (StringUtil.isEmpty(existscurrency)) {
-			fSBankBalance.updateCurrency(bank, currency);
-		}
 		ICube cubeBank = getBankCube(bank);
 		String id = cubeBank.saveDoc(TABLE_Deposits, new TupleDocument<>(bill));
 		bill.setCode(id);
@@ -177,13 +159,13 @@ public class FSBankTransactionBS implements IFSBankTransactionBS {
 		if (StringUtil.isEmpty(poundageRate)) {
 			poundageRate = "0";
 		}
-		String precision = fSBankPropertiesBS.get(bank, BankProperty.CONSTANS_KEY_bigDecimal_setPrecision);
+		String precision = fSBankPropertiesBS.get(bank, BankProperty.CONSTANS_KEY_bigDecimal_scale);
 		if (StringUtil.isEmpty(precision)) {
-			precision = BigDecimalConstants.setPrecision + "";
+			precision = BigDecimalConstants.scale + "";
 		}
 		String roundingMode = fSBankPropertiesBS.get(bank, BankProperty.CONSTANS_KEY_bigDecimal_roundingMode);
 		if (StringUtil.isEmpty(roundingMode)) {
-			roundingMode = BigDecimalConstants.roundingMode_forNewDecimal + "";
+			roundingMode = BigDecimalConstants.roundingMode + "";
 		}
 		CashoutBill bill = new CashoutBill();
 		bill.setCashoutor(cashoutor);
@@ -211,18 +193,7 @@ public class FSBankTransactionBS implements IFSBankTransactionBS {
 		if (freeAmountBalance.compareTo(reqAmount) <= 0) {
 			throw new EcmException(String.format("银行:%s 现金存量不足", bank));
 		}
-		String poundageRate = fSBankPropertiesBS.get(bank, BankProperty.CONSTANS_KEY_poundageRate);// 手续费率
-		if (StringUtil.isEmpty(poundageRate)) {
-			poundageRate = "0";
-		}
-		String precision = fSBankPropertiesBS.get(bank, BankProperty.CONSTANS_KEY_bigDecimal_setPrecision);
-		if (StringUtil.isEmpty(precision)) {
-			precision = BigDecimalConstants.setPrecision + "";
-		}
-		String roundingMode = fSBankPropertiesBS.get(bank, BankProperty.CONSTANS_KEY_bigDecimal_roundingMode);
-		if (StringUtil.isEmpty(roundingMode)) {
-			roundingMode = BigDecimalConstants.roundingMode_forNewDecimal + "";
-		}
+
 		CashoutBill bill = new CashoutBill();
 		bill.setCashoutor(cashoutor);
 		bill.setCode(null);
@@ -230,22 +201,60 @@ public class FSBankTransactionBS implements IFSBankTransactionBS {
 		bill.setIdentity(identity);
 		bill.setMemo(memo);
 		bill.setReqAmount(reqAmount);
-		bill.setPoundageRate(new BigDecimal(poundageRate,
-				new MathContext(Integer.valueOf(precision), RoundingMode.valueOf(roundingMode))));
+		bill.setPoundageRate(this.poundageRate(fSBankPropertiesBS, bank));
 		bill.setPoundageAmount(bill.getReqAmount().multiply(bill.getPoundageRate()));// 为提现*手续费义
 		bill.setResAmount(bill.getReqAmount().subtract(bill.getPoundageAmount()));
 		freeAmountBalance = freeAmountBalance.subtract(bill.getReqAmount());
 		bill.setBalanceType("freeBalance");
 		bill.setBalance(freeAmountBalance);
 		fSBankBalance.updateFreeAmountBalance(bank, freeAmountBalance);
-		String id=getBankCube(bank).saveDoc(TABLE_Cashouts, new TupleDocument<>(bill));
+		String id = getBankCube(bank).saveDoc(TABLE_Cashouts, new TupleDocument<>(bill));
 		bill.setCode(id);
 	}
-	
+
 	@Override
 	public void exchangeBill(String bank, String exchanger, BigDecimal bondQuantities) {
-		ExchangeBill bill=new ExchangeBill();
-		
+		BigDecimal price = fSBankBalance.getBondPrice(bank);
+		ExchangeBill bill = new ExchangeBill();
+		bill.setBondQuantities(bondQuantities);
+		bill.setCode(null);
+		bill.setCurrBondPrice(price);
+		bill.setEtime(System.currentTimeMillis());
+		bill.setExchanger(exchanger);
+		String precision = fSBankPropertiesBS.get(bank, BankProperty.CONSTANS_KEY_bigDecimal_scale);
+		if (StringUtil.isEmpty(precision)) {
+			precision = BigDecimalConstants.scale + "";
+		}
+		String roundingMode = fSBankPropertiesBS.get(bank, BankProperty.CONSTANS_KEY_bigDecimal_roundingMode);
+		if (StringUtil.isEmpty(roundingMode)) {
+			roundingMode = BigDecimalConstants.roundingMode + "";
+		}
+		BigDecimal realFloat = bondQuantities.multiply(price,
+				new MathContext(Integer.valueOf(precision), RoundingMode.valueOf(roundingMode)));
+		BigDecimal getFloat = bondQuantities.multiply(price, new MathContext(2, RoundingMode.valueOf(roundingMode)));
+		bill.setDeservedAmount(getFloat);
+		bill.setTailAmount(realFloat.subtract(getFloat));
+		BigDecimal tailAmountBalance = fSBankBalance.getTailAmountBalance(bank);
+		fSBankBalance.updateTailAmountBalance(bank, tailAmountBalance.add(bill.getTailAmount()));
+
+		BigDecimal bondQuantitiesBalance = fSBankBalance.getBondQuantitiesBalance(bank);
+		fSBankBalance.updateBondQuantitiesBalance(bank, bondQuantitiesBalance.subtract(bondQuantities));
+
+		BigDecimal bondAmountBalance = fSBankBalance.getBondAmountBalance(bank);
+		BigDecimal reserveAmountBalance = fSBankBalance.getReserveAmountBalance(bank);
+		if (realFloat.compareTo(bondAmountBalance) <= 0) {
+			fSBankBalance.updateBondAmountBalance(bank, bondAmountBalance.subtract(realFloat));
+		} else {
+			fSBankBalance.updateBondAmountBalance(bank, new BigDecimal(0));
+			fSBankBalance.updateReserveAmountBalance(bank,
+					reserveAmountBalance.subtract(realFloat.subtract(bondAmountBalance)));
+		}
+		BigDecimal newprice = (fSBankBalance.getBondAmountBalance(bank)
+				.add(fSBankBalance.getReserveAmountBalance(bank))).divide(fSBankBalance.getBondQuantitiesBalance(bank),
+						new MathContext(Integer.valueOf(precision), RoundingMode.valueOf(roundingMode)));
+		fSBankBalance.updateBondPrice(bank, newprice);
+		bill.setNewBondPrice(newprice);
+		this.getBankCube(bank).saveDoc(TABLE_Exchanges, new TupleDocument<>(bill));
 	}
 
 }

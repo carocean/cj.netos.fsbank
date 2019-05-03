@@ -1,4 +1,4 @@
-package cj.netos.fsbank.plugin.FSBAEngine.bs;
+package cj.netos.fsbank.plugin.FSBAEngine;
 
 import java.math.BigDecimal;
 

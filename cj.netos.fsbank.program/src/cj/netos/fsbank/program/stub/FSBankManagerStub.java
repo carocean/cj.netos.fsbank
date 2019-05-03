@@ -1,6 +1,5 @@
 package cj.netos.fsbank.program.stub;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 import cj.netos.fsbank.args.BState;
@@ -9,12 +8,10 @@ import cj.netos.fsbank.args.BankInfo;
 import cj.netos.fsbank.args.BankLicense;
 import cj.netos.fsbank.args.BankPresident;
 import cj.netos.fsbank.args.BankState;
-import cj.netos.fsbank.args.SeparateBillRuler;
 import cj.netos.fsbank.bs.IFSBankCompanyBS;
 import cj.netos.fsbank.bs.IFSBankInfoBS;
 import cj.netos.fsbank.bs.IFSBankLicenseBS;
 import cj.netos.fsbank.bs.IFSBankPresidentBS;
-import cj.netos.fsbank.bs.IFSBankSeparateBillRulerBS;
 import cj.netos.fsbank.bs.IFSBankStateBS;
 import cj.netos.fsbank.stub.IFSBankManagerStub;
 import cj.studio.ecm.annotation.CjService;
@@ -38,8 +35,6 @@ public class FSBankManagerStub extends GatewayAppSiteRestStub implements IFSBank
 	@CjServiceRef(refByName = "FSBAEngine.fSBankLicenseBS")
 	IFSBankLicenseBS fSBankLicenseBS;
 
-	@CjServiceRef(refByName = "FSBAEngine.fSBankSeparateBillBS")
-	IFSBankSeparateBillRulerBS fSBankSeparateBillBS;
 
 	@Override
 	public String registerBank(BankInfo info) throws CircuitException {
@@ -105,28 +100,7 @@ public class FSBankManagerStub extends GatewayAppSiteRestStub implements IFSBank
 		fSBankCompanyBS.saveCompany(company);
 	}
 
-	@Override
-	public void setBankSeparateBillRule(SeparateBillRuler ruler) throws CircuitException {
-		if (StringUtil.isEmpty(ruler.getBank())) {
-			throw new CircuitException("404", String.format("未指定银行"));
-		}
-		if (ruler.getBondRate() == null || new BigDecimal(0).compareTo(ruler.getBondRate()) >= 0) {
-			throw new CircuitException("404", String.format("发债金率未指定"));
-		}
-		if (ruler.getReserveRate() == null || new BigDecimal(0).compareTo(ruler.getReserveRate()) >= 0) {
-			throw new CircuitException("404", String.format("准备金率未指定"));
-		}
-		if (ruler.getFreeMRate() == null || new BigDecimal(0).compareTo(ruler.getFreeMRate()) >= 0) {
-			ruler.setFreeMRate(new BigDecimal(1).subtract(ruler.getBondRate().add(ruler.getReserveRate())));
-		}
-		if (!fSBankInfoBS.existsBankCode(ruler.getBank())) {
-			throw new CircuitException("404", String.format("银行代码：%s 不存在", ruler.getBank()));
-		}
-		if (fSBankSeparateBillBS.hasRulerOfBank(ruler.getBank())) {
-			throw new CircuitException("500", String.format("银行：%s 已存在拆单规则", ruler.getBank()));
-		}
-		fSBankSeparateBillBS.saveRuler(ruler);
-	}
+	
 
 	@Override
 	public String issueBankLicense(String presidentPwd, BankLicense license) throws CircuitException {
@@ -149,17 +123,10 @@ public class FSBankManagerStub extends GatewayAppSiteRestStub implements IFSBank
 		if (!StringUtil.isEmpty(license.getCompany()) && !fSBankCompanyBS.hasCompanyOfBank(license.getBank())) {
 			throw new CircuitException("404", String.format("银行资料不完善，银行：%s 还没有归属企业", license.getBank()));
 		}
-		if (!fSBankSeparateBillBS.hasRulerOfBank(license.getBank())) {
-			throw new CircuitException("404", String.format("资料不完整，银行：%s 没有拆单规则", license.getBank()));
-		}
 		fSBankLicenseBS.saveLicense(presidentPwd, license);
 		return license.getCode();
 	}
 
-	@Override
-	public SeparateBillRuler getBankSeparateBilltRuler(String bank) {
-		return fSBankSeparateBillBS.getRuler(bank);
-	}
 
 	@Override
 	public void deregisterBank(String bankCode) {

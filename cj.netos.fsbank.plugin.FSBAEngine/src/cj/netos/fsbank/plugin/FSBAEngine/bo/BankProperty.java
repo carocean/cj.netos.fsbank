@@ -1,11 +1,15 @@
 package cj.netos.fsbank.plugin.FSBAEngine.bo;
 
 public class BankProperty {
+	public final static transient String CONSTANS_KEY_ultimate_BondPrice = "ultimate_BondPrice";
+	public final static transient String CONSTANS_KEY_BondKind = "bondKind";
+	public final static transient String CONSTANS_KEY_Currency = "currency";
 	public final static transient String CONSTANS_KEY_poundageRate = "poundageRate";
 	public final static transient String CONSTANS_KEY_bigDecimal_scale = "bigDecimal.scale";
 	public final static transient String CONSTANS_KEY_bigDecimal_roundingMode = "bigDecimal.roundingMode";
-	public final static transient String CONSTANS_KEY_bigDecimal_setPrecision = "bigDecimal.setPrecision";
-
+	public final static transient String CONSTANS_KEY_Rule_bondRate = "rule.bondRate";
+	public final static transient String CONSTANS_KEY_Rule_freeRate = "rule.freeMRate";
+	public final static transient String CONSTANS_KEY_Rule_reserveRate = "rule.reserveRate";
 	String key;
 	String value;
 	String bank;

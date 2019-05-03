@@ -6,7 +6,6 @@ public class SepareteBill {
 	BigDecimal bondRate;
 	BigDecimal bondAmount;
 	BigDecimal bondQuantities;
-	String bondKind;
 	BigDecimal reserveRate;
 	BigDecimal reserveAmount;
 	BigDecimal freeMRate;
@@ -28,12 +27,6 @@ public class SepareteBill {
 	}
 	public void setBondQuantities(BigDecimal bondQuantities) {
 		this.bondQuantities = bondQuantities;
-	}
-	public String getBondKind() {
-		return bondKind;
-	}
-	public void setBondKind(String bondKind) {
-		this.bondKind = bondKind;
 	}
 	public BigDecimal getReserveRate() {
 		return reserveRate;

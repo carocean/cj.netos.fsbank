@@ -5,7 +5,6 @@ import java.math.BigDecimal;
 public class ExchangeBill {
 	String code;
 	String exchanger;
-	String bondKind;
 	BigDecimal bondQuantities;
 	BigDecimal currBondPrice;
 	BigDecimal newBondPrice;
@@ -23,12 +22,6 @@ public class ExchangeBill {
 	}
 	public void setExchanger(String exchanger) {
 		this.exchanger = exchanger;
-	}
-	public String getBondKind() {
-		return bondKind;
-	}
-	public void setBondKind(String bondKind) {
-		this.bondKind = bondKind;
 	}
 	public BigDecimal getBondQuantities() {
 		return bondQuantities;

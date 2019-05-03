@@ -7,7 +7,6 @@ import cj.netos.fsbank.args.BankCompany;
 import cj.netos.fsbank.args.BankInfo;
 import cj.netos.fsbank.args.BankLicense;
 import cj.netos.fsbank.args.BankPresident;
-import cj.netos.fsbank.args.SeparateBillRuler;
 import cj.studio.ecm.net.CircuitException;
 import cj.studio.gateway.stub.annotation.CjStubInContentKey;
 import cj.studio.gateway.stub.annotation.CjStubInParameter;
@@ -34,13 +33,6 @@ public interface IFSBankManagerStub {
 	String issueBankLicense(
 			@CjStubInParameter(key = "presidentPwd", usage = "行长密码，要在license内容中指定行长") String presidentPwd,
 			@CjStubInContentKey(key = "license", usage = "银行照片，json") BankLicense license) throws CircuitException;
-
-	@CjStubMethod(command = "post", usage = "设置拆单规则")
-	void setBankSeparateBillRule(@CjStubInContentKey(key = "ruler", usage = "规则，json") SeparateBillRuler ruler)
-			throws CircuitException;
-
-	@CjStubMethod(usage = "获取拆单规则")
-	SeparateBillRuler getBankSeparateBilltRuler(@CjStubInParameter(key = "bank", usage = "银行代码") String bank);
 
 	@CjStubMethod(usage = "吊销指定的银行，吊销并不是删除，只是改变状态为吊销")
 	void deregisterBank(@CjStubInParameter(key = "bankCode", usage = "银行代码") String bankCode) throws CircuitException;

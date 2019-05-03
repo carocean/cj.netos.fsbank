@@ -2,7 +2,6 @@ package cj.netos.fsbank.program.reactor.valves;
 
 import java.math.BigDecimal;
 
-import cj.netos.fsbank.args.SeparateBillRuler;
 import cj.netos.fsbank.bs.IFSBankTransactionBS;
 import cj.netos.fsbank.program.IBankCacher;
 import cj.studio.ecm.annotation.CjService;
@@ -20,12 +19,10 @@ public class DepositValve implements IValve {
 
 	@Override
 	public void flow(Event e, IPipeline pipeline) {
-		SeparateBillRuler ruler = bankCacher.getBankRuler(e.getKey());
 		String depositor = (String) e.getParameters().get("depositor");
-		String currency = (String) e.getParameters().get("currency");
 		BigDecimal amount = (BigDecimal) e.getParameters().get("amount");
 		
-		fSBankTransactionBS.separateBill(e.getKey(),depositor,currency,amount, ruler);
+		fSBankTransactionBS.depositBill(e.getKey(),depositor,amount);
 	}
 
 }

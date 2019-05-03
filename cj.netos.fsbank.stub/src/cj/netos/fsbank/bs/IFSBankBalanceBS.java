@@ -6,19 +6,12 @@ import cj.netos.fsbank.args.Balance;
 
 public interface IFSBankBalanceBS {
 	static String TABLE_NAME = "balances";
+
 	Balance loadBalance(String bank);
 
 	BigDecimal getBondPrice(String bank);
 
 	void updateBondPrice(String bank, BigDecimal price);
-
-	String getBondKind(String bank);
-
-	void updateBondKind(String bank, String kind);
-
-	String getCurrency(String bank);
-
-	void updateCurrency(String bank, String currency);
 
 	BigDecimal getBondAmountBalance(String bank);
 
