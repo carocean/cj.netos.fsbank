@@ -11,8 +11,8 @@ public class FSBankPropertiesStub extends GatewayAppSiteRestStub implements IFSB
 	@CjServiceRef(refByName = "FSBAEngine.fSBankPropertiesBS")
 	IFSBankPropertiesBS fSBankPropertiesBS;
 	@Override
-	public void put(String bank, String key, String value) {
-		fSBankPropertiesBS.put(bank,key,value);
+	public void put(String bank, String key, String value,String desc) {
+		fSBankPropertiesBS.put(bank,key,value,desc);
 	}
 
 	@Override
@@ -24,7 +24,10 @@ public class FSBankPropertiesStub extends GatewayAppSiteRestStub implements IFSB
 	public String[] enumKey(String bank) {
 		return fSBankPropertiesBS.enumKey(bank);
 	}
-
+	@Override
+	public String desc(String bank, String key) {
+		return fSBankPropertiesBS.desc(bank,key);
+	}
 	@Override
 	public String[] pageKeys(String bank, int currPage, int pageSize) {
 		return fSBankPropertiesBS.pageKeys(bank,currPage,pageSize);

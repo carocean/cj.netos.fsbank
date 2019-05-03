@@ -11,7 +11,6 @@ import cj.netos.fsbank.bs.IFSBankPropertiesBS;
 import cj.netos.fsbank.plugin.FSBAEngine.bo.BankProperty;
 import cj.studio.ecm.annotation.CjService;
 import cj.studio.ecm.annotation.CjServiceRef;
-import cj.ultimate.util.StringUtil;
 
 @CjService(name = "fSBankPropertiesBS")
 public class FSBankPropertiesBS implements IFSBankPropertiesBS {
@@ -24,11 +23,11 @@ public class FSBankPropertiesBS implements IFSBankPropertiesBS {
 	}
 
 	@Override
-	public void put(String bank, String key, String value) {
-		if (StringUtil.isEmpty(value) && containsKey(bank, key)) {
+	public void put(String bank, String key, String value, String desc) {
+		if (containsKey(bank, key)) {
 			remove(bank, key);
 		}
-		BankProperty property = new BankProperty(bank, key, value);
+		BankProperty property = new BankProperty(bank, key, value, desc);
 		home.saveDoc(TABLE_KEY, new TupleDocument<>(property));
 	}
 
@@ -38,8 +37,20 @@ public class FSBankPropertiesBS implements IFSBankPropertiesBS {
 	}
 
 	@Override
+	public String desc(String bank, String key) {
+		String cjql = String.format(
+				"select {'tuple.desc':1} from tuple %s %s where {'tuple.bank':'%s','tuple.key':'%s'}", TABLE_KEY,
+				BankProperty.class.getName(), bank, key);
+		IQuery<BankProperty> q = home.createQuery(cjql);
+		IDocument<BankProperty> doc = q.getSingleResult();
+		if (doc == null)
+			return null;
+		return doc.tuple().getDesc();
+	}
+
+	@Override
 	public String get(String bank, String key) {
-		String cjql = String.format("select {'tuple':'*'} from tuple %s %s where {'tuple.bank':'%s','tuple.key':'%s'}",
+		String cjql = String.format("select {'tuple.value':1} from tuple %s %s where {'tuple.bank':'%s','tuple.key':'%s'}",
 				TABLE_KEY, BankProperty.class.getName(), bank, key);
 		IQuery<BankProperty> q = home.createQuery(cjql);
 		IDocument<BankProperty> doc = q.getSingleResult();

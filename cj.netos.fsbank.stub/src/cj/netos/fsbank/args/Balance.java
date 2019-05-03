@@ -5,8 +5,7 @@ import java.math.BigDecimal;
 public class Balance {
 	BigDecimal bondPrice;
 	BigDecimal bondQuantities;
-	BigDecimal reserveAmount;
-	BigDecimal bondAmount;
+	BigDecimal freezeAmount;
 	BigDecimal freeAmount;
 	BigDecimal tailAmount;
 
@@ -26,20 +25,12 @@ public class Balance {
 		this.bondQuantities = bondQuantities;
 	}
 
-	public BigDecimal getReserveAmount() {
-		return reserveAmount;
+	public BigDecimal getFreezeAmount() {
+		return freezeAmount;
 	}
 
-	public void setReserveAmount(BigDecimal reserveAmount) {
-		this.reserveAmount = reserveAmount;
-	}
-
-	public BigDecimal getBondAmount() {
-		return bondAmount;
-	}
-
-	public void setBondAmount(BigDecimal bondAmount) {
-		this.bondAmount = bondAmount;
+	public void setFreezeAmount(BigDecimal freezeAmount) {
+		this.freezeAmount = freezeAmount;
 	}
 
 	public BigDecimal getFreeAmount() {

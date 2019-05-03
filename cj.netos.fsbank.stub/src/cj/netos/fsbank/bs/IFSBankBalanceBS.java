@@ -13,17 +13,13 @@ public interface IFSBankBalanceBS {
 
 	void updateBondPrice(String bank, BigDecimal price);
 
-	BigDecimal getBondAmountBalance(String bank);
-
-	void updateBondAmountBalance(String bank, BigDecimal balance);
-
 	BigDecimal getBondQuantitiesBalance(String bank);
 
 	void updateBondQuantitiesBalance(String bank, BigDecimal balance);
 
-	BigDecimal getReserveAmountBalance(String bank);
+	BigDecimal getFreezeAmountBalance(String bank);
 
-	void updateReserveAmountBalance(String bank, BigDecimal balance);
+	void updateFreezeAmountBalance(String bank, BigDecimal balance);
 
 	BigDecimal getFreeAmountBalance(String bank);
 

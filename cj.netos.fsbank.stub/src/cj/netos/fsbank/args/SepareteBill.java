@@ -8,8 +8,8 @@ public class SepareteBill {
 	BigDecimal bondQuantities;
 	BigDecimal reserveRate;
 	BigDecimal reserveAmount;
-	BigDecimal freeMRate;
-	BigDecimal freeMAmount;
+	BigDecimal freeRate;
+	BigDecimal freeAmount;
 	public BigDecimal getBondRate() {
 		return bondRate;
 	}
@@ -40,17 +40,17 @@ public class SepareteBill {
 	public void setReserveAmount(BigDecimal reserveAmount) {
 		this.reserveAmount = reserveAmount;
 	}
-	public BigDecimal getFreeMRate() {
-		return freeMRate;
+	public BigDecimal getFreeRate() {
+		return freeRate;
 	}
-	public void setFreeMRate(BigDecimal freeMRate) {
-		this.freeMRate = freeMRate;
+	public void setFreeRate(BigDecimal freeRate) {
+		this.freeRate = freeRate;
 	}
-	public BigDecimal getFreeMAmount() {
-		return freeMAmount;
+	public BigDecimal getFreeAmount() {
+		return freeAmount;
 	}
-	public void setFreeMAmount(BigDecimal freeMAmount) {
-		this.freeMAmount = freeMAmount;
+	public void setFreeAmount(BigDecimal freeAmount) {
+		this.freeAmount = freeAmount;
 	}
 	
 	

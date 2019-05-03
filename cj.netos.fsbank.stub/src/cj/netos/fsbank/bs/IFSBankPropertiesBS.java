@@ -2,7 +2,7 @@ package cj.netos.fsbank.bs;
 
 public interface IFSBankPropertiesBS {
 	static String TABLE_KEY="properties";
-	void put(String bank, String key, String value);
+	void put(String bank, String key, String value,String desc);
 
 	void remove(String bank, String key);
 
@@ -15,5 +15,7 @@ public interface IFSBankPropertiesBS {
 	String[] pageKeys(String bank, int currPage, int pageSize);
 
 	long count(String bank);
+
+	String desc(String bank, String key);
 
 }

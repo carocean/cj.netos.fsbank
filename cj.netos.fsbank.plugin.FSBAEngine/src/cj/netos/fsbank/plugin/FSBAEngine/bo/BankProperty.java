@@ -12,16 +12,18 @@ public class BankProperty {
 	public final static transient String CONSTANS_KEY_Rule_reserveRate = "rule.reserveRate";
 	String key;
 	String value;
+	String desc;
 	String bank;
 
 	public BankProperty() {
 		// TODO Auto-generated constructor stub
 	}
 
-	public BankProperty(String bank, String key, String value) {
+	public BankProperty(String bank, String key, String value,String desc) {
 		this.bank = bank;
 		this.key = key;
 		this.value = value;
+		this.desc=desc;
 	}
 
 	public String getKey() {
@@ -39,7 +41,12 @@ public class BankProperty {
 	public void setValue(String value) {
 		this.value = value;
 	}
-
+	public String getDesc() {
+		return desc;
+	}
+	public void setDesc(String desc) {
+		this.desc = desc;
+	}
 	public String getBank() {
 		return bank;
 	}
