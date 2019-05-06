@@ -7,7 +7,6 @@ import cj.lns.chip.sos.cube.framework.IDocument;
 import cj.lns.chip.sos.cube.framework.IQuery;
 import cj.lns.chip.sos.cube.framework.TupleDocument;
 import cj.netos.fsbank.args.BankInfo;
-import cj.netos.fsbank.args.BankLicense;
 import cj.netos.fsbank.bs.IFSBankInfoBS;
 import cj.studio.ecm.annotation.CjService;
 import cj.studio.ecm.annotation.CjServiceRef;
@@ -62,8 +61,8 @@ public class FSBankInfoBS implements IFSBankInfoBS {
 
 	@Override
 	public BankInfo getBankInfo(String bankCode) {
-		String cjql = String.format("select {'tuple':'*'} from tuple %s %s where {'_id':ObjectId('%s')}", TABLE_BANK_INFO,
-				BankInfo.class.getName(),bankCode);
+		String cjql = String.format("select {'tuple':'*'} from tuple %s %s where {'_id':ObjectId('%s')}",
+				TABLE_BANK_INFO, BankInfo.class.getName(), bankCode);
 		IQuery<BankInfo> q = home.createQuery(cjql);
 		IDocument<BankInfo> doc = q.getSingleResult();
 		if (doc == null)
@@ -73,19 +72,7 @@ public class FSBankInfoBS implements IFSBankInfoBS {
 	}
 
 	@Override
-	public BankLicense getBankLicense(String bankCode) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
 	public List<BankInfo> pageBankInfo(int currPage, int pageSize) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public List<BankLicense> pageBankLicense(int currPage, int pageSize) {
 		// TODO Auto-generated method stub
 		return null;
 	}

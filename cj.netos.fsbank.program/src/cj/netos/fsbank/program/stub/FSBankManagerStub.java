@@ -35,7 +35,6 @@ public class FSBankManagerStub extends GatewayAppSiteRestStub implements IFSBank
 	@CjServiceRef(refByName = "FSBAEngine.fSBankLicenseBS")
 	IFSBankLicenseBS fSBankLicenseBS;
 
-
 	@Override
 	public String registerBank(BankInfo info) throws CircuitException {
 		if (StringUtil.isEmpty(info.getName())) {
@@ -100,8 +99,6 @@ public class FSBankManagerStub extends GatewayAppSiteRestStub implements IFSBank
 		fSBankCompanyBS.saveCompany(company);
 	}
 
-	
-
 	@Override
 	public String issueBankLicense(String presidentPwd, BankLicense license) throws CircuitException {
 		if (StringUtil.isEmpty(license.getBank())) {
@@ -126,7 +123,6 @@ public class FSBankManagerStub extends GatewayAppSiteRestStub implements IFSBank
 		fSBankLicenseBS.saveLicense(presidentPwd, license);
 		return license.getCode();
 	}
-
 
 	@Override
 	public void deregisterBank(String bankCode) {
@@ -154,18 +150,18 @@ public class FSBankManagerStub extends GatewayAppSiteRestStub implements IFSBank
 	}
 
 	@Override
-	public BankLicense getBankLicense(String bankCode) {
-		return fSBankInfoBS.getBankLicense(bankCode);
-	}
-
-	@Override
 	public List<BankInfo> pageBankInfo(int currPage, int pageSize) {
 		return fSBankInfoBS.pageBankInfo(currPage, pageSize);
 	}
 
 	@Override
+	public BankLicense getBankLicense(String bankCode) {
+		return fSBankLicenseBS.getBankLicense(bankCode);
+	}
+
+	@Override
 	public List<BankLicense> pageBankLicense(int currPage, int pageSize) {
-		return fSBankInfoBS.pageBankLicense(currPage, pageSize);
+		return fSBankLicenseBS.pageBankLicense(currPage, pageSize);
 	}
 
 }

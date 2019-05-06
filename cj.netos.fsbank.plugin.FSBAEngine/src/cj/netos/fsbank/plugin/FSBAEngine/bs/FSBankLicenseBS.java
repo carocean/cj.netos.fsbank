@@ -1,9 +1,13 @@
 package cj.netos.fsbank.plugin.FSBAEngine.bs;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import cj.lns.chip.sos.cube.framework.ICube;
+import cj.lns.chip.sos.cube.framework.IDocument;
+import cj.lns.chip.sos.cube.framework.IQuery;
 import cj.lns.chip.sos.cube.framework.TupleDocument;
 import cj.netos.fsbank.args.BankLicense;
 import cj.netos.fsbank.bs.IFSBankLicenseBS;
@@ -16,6 +20,7 @@ import cj.studio.ecm.net.CircuitException;
 import cj.studio.gateway.stub.annotation.CjStubRef;
 import cj.ultimate.gson2.com.google.gson.Gson;
 import cj.ultimate.gson2.com.google.gson.reflect.TypeToken;
+
 @CjBridge(aspects = "@rest")
 @CjService(name = "fSBankLicenseBS")
 public class FSBankLicenseBS implements IFSBankLicenseBS {
@@ -26,7 +31,7 @@ public class FSBankLicenseBS implements IFSBankLicenseBS {
 	ITenantTokenStub tenantTokenStub;
 
 	@Override
-	public void saveLicense(String presidentPwd,BankLicense license) throws CircuitException{
+	public void saveLicense(String presidentPwd, BankLicense license) throws CircuitException {
 		license.setCode(null);
 		// 产生token
 		String json = "";
@@ -34,11 +39,12 @@ public class FSBankLicenseBS implements IFSBankLicenseBS {
 			json = tenantTokenStub.genToken("netos.fsbank", license.getPresident(), presidentPwd,
 					license.getExpiryDate());
 		} catch (AuthenticationException e) {
-			throw new CircuitException(e.getStatus(),e);
+			throw new CircuitException(e.getStatus(), e);
 		}
-		Map<String,String> map=new Gson().fromJson(json, new TypeToken<HashMap<String,String>>(){}.getType());
-		if(!"200".equals(map.get("status"))) {
-			throw new CircuitException(map.get("status"),"uc消息："+map.get("message"));
+		Map<String, String> map = new Gson().fromJson(json, new TypeToken<HashMap<String, String>>() {
+		}.getType());
+		if (!"200".equals(map.get("status"))) {
+			throw new CircuitException(map.get("status"), "uc消息：" + map.get("message"));
 		}
 		license.setToken(map.get("result"));
 		String id = home.saveDoc(TABLE_LISENCE, new TupleDocument<>(license));
@@ -49,6 +55,35 @@ public class FSBankLicenseBS implements IFSBankLicenseBS {
 	public boolean hasLicenseOfBank(String bank) {// 一个银行一个企业
 		String where = String.format("{'tuple.bank':'%s'}", bank);
 		return home.tupleCount(TABLE_LISENCE, where) > 0;
+	}
+
+	@Override
+	public BankLicense getBankLicense(String bankCode) {
+		String cjql = "select {'tuple':'*'}.sort({'_id':-1,'tuple.issueDate':-1}) from tuple ?(colName) ?(clazz) where {'tuple.bank':'?(bank)'}";
+		IQuery<BankLicense> q = home.createQuery(cjql);
+		q.setParameter("colName", TABLE_LISENCE);
+		q.setParameter("clazz", BankLicense.class.getName());
+		q.setParameter("bank", bankCode);
+		IDocument<BankLicense> doc = q.getSingleResult();
+		if (doc == null)
+			return null;
+		doc.tuple().setCode(doc.docid());
+		return doc.tuple();
+	}
+
+	@Override
+	public List<BankLicense> pageBankLicense(int currPage, int pageSize) {
+		String cjql = "select {'tuple':'*'} from tuple ?(colName) ?(clazz) where {}";
+		IQuery<BankLicense> q = home.createQuery(cjql);
+		q.setParameter("colName", TABLE_LISENCE);
+		q.setParameter("clazz", BankLicense.class.getName());
+		List<IDocument<BankLicense>> docs = q.getResultList();
+		List<BankLicense> list = new ArrayList<>();
+		for (IDocument<BankLicense> doc : docs) {
+			doc.tuple().setCode(doc.docid());
+			list.add(doc.tuple());
+		}
+		return list;
 	}
 
 }
