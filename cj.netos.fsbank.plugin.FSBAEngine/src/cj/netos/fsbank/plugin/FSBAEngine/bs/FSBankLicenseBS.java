@@ -86,4 +86,12 @@ public class FSBankLicenseBS implements IFSBankLicenseBS {
 		return list;
 	}
 
+	@Override
+	public boolean isExpired(String bankCode) {
+		BankLicense license=getBankLicense(bankCode);
+		if(license==null)return true;
+//		license.getToken();//商户向平台申请token，成功后其金证银行拥有牌照，系统由于仍在netos上部署无商户无关，因此校验程序在此校验，发现过期则转为冻结
+		return System.currentTimeMillis()-license.getExpiryDate()>0;
+	}
+
 }

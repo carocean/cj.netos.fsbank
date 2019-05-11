@@ -7,10 +7,8 @@
 -quiet 
 -windowtitle 'cj.netos.fsbank.stub 1.0.0 API'
 '/Users/caroceanjofers/studio/github/cj.netos.fsbank/cj.netos.fsbank.stub/src/cj/netos/fsbank/bs/IBankAssetBS.java'
-'/Users/caroceanjofers/studio/github/cj.netos.fsbank/cj.netos.fsbank.stub/src/cj/netos/fsbank/bs/IFSBankCompanyBS.java'
 '/Users/caroceanjofers/studio/github/cj.netos.fsbank/cj.netos.fsbank.stub/src/cj/netos/fsbank/bs/IFSBankTransactionBS.java'
 '/Users/caroceanjofers/studio/github/cj.netos.fsbank/cj.netos.fsbank.stub/src/cj/netos/fsbank/bs/IFSBankPropertiesBS.java'
-'/Users/caroceanjofers/studio/github/cj.netos.fsbank/cj.netos.fsbank.stub/src/cj/netos/fsbank/bs/IFSBankPresidentBS.java'
 '/Users/caroceanjofers/studio/github/cj.netos.fsbank/cj.netos.fsbank.stub/src/cj/netos/fsbank/bs/IFSBankLicenseBS.java'
 '/Users/caroceanjofers/studio/github/cj.netos.fsbank/cj.netos.fsbank.stub/src/cj/netos/fsbank/bs/IPersonalAssetBS.java'
 '/Users/caroceanjofers/studio/github/cj.netos.fsbank/cj.netos.fsbank.stub/src/cj/netos/fsbank/bs/IFSBankBalanceBS.java'

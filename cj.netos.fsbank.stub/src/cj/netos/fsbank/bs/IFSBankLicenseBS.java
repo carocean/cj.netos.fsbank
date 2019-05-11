@@ -16,4 +16,6 @@ public interface IFSBankLicenseBS {
 
 	List<BankLicense> pageBankLicense(int currPage, int pageSize);
 
+	boolean isExpired(String bankCode);
+
 }

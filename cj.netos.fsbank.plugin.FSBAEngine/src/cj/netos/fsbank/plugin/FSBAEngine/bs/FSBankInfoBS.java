@@ -1,6 +1,10 @@
 package cj.netos.fsbank.plugin.FSBAEngine.bs;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import org.bson.Document;
+import org.bson.conversions.Bson;
 
 import cj.lns.chip.sos.cube.framework.ICube;
 import cj.lns.chip.sos.cube.framework.IDocument;
@@ -36,30 +40,6 @@ public class FSBankInfoBS implements IFSBankInfoBS {
 	}
 
 	@Override
-	public void deregisterBank(String bankCode) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void freezeBank(String bankCode) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void pauseBank(String bankCode) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void resumeBank(String bankCode) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
 	public BankInfo getBankInfo(String bankCode) {
 		String cjql = String.format("select {'tuple':'*'} from tuple %s %s where {'_id':ObjectId('%s')}",
 				TABLE_BANK_INFO, BankInfo.class.getName(), bankCode);
@@ -73,8 +53,37 @@ public class FSBankInfoBS implements IFSBankInfoBS {
 
 	@Override
 	public List<BankInfo> pageBankInfo(int currPage, int pageSize) {
-		// TODO Auto-generated method stub
-		return null;
+		String cjql = String.format("select {'tuple':'*'}.limit(%s).skip(%s) from tuple %s %s where {}", pageSize,
+				currPage, TABLE_BANK_INFO, BankInfo.class.getName());
+		IQuery<BankInfo> q = home.createQuery(cjql);
+		List<IDocument<BankInfo>> docs = q.getResultList();
+		List<BankInfo> list = new ArrayList<BankInfo>();
+		for (IDocument<BankInfo> doc : docs) {
+			doc.tuple().setCode(doc.docid());
+			list.add(doc.tuple());
+		}
+		return list;
+	}
+
+	@Override
+	public void updateBankName(String bank, String name) {
+		Bson filter = Document.parse(String.format("{'_id':ObjectId('%s')}", bank));
+		Bson update = Document.parse(String.format("{'$set':{'tuple.name':'%s'}}", name));
+		home.updateDocOne(TABLE_BANK_INFO, filter, update);
+	}
+
+	@Override
+	public void updateBankPresident(String bank, String president) {
+		Bson filter = Document.parse(String.format("{'_id':ObjectId('%s')}", bank));
+		Bson update = Document.parse(String.format("{'$set':{'tuple.president':'%s'}}", president));
+		home.updateDocOne(TABLE_BANK_INFO, filter, update);
+	}
+
+	@Override
+	public void updateBankCompany(String bank, String company) {
+		Bson filter = Document.parse(String.format("{'_id':ObjectId('%s')}", bank));
+		Bson update = Document.parse(String.format("{'$set':{'tuple.company':'%s'}}", company));
+		home.updateDocOne(TABLE_BANK_INFO, filter, update);
 	}
 
 }

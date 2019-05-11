@@ -7,14 +7,6 @@ import cj.netos.fsbank.args.BankInfo;
 public interface IFSBankInfoBS {
 	static String TABLE_BANK_INFO = "banks";
 
-	void deregisterBank(String bankCode);
-
-	void freezeBank(String bankCode);
-
-	void pauseBank(String bankCode);
-
-	void resumeBank(String bankCode);
-
 	BankInfo getBankInfo(String bankCode);
 
 	List<BankInfo> pageBankInfo(int currPage, int pageSize);
@@ -24,4 +16,10 @@ public interface IFSBankInfoBS {
 	void saveBank(BankInfo info);
 
 	boolean existsBankCode(String bank);
+
+	void updateBankName(String bank, String name);
+
+	void updateBankPresident(String bank, String president);
+
+	void updateBankCompany(String bank, String company);
 }
