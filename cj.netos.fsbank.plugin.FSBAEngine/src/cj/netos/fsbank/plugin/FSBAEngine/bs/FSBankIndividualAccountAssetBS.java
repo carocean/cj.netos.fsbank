@@ -9,6 +9,7 @@ import org.bson.Document;
 import org.bson.conversions.Bson;
 
 import com.mongodb.client.AggregateIterable;
+import com.mongodb.client.model.UpdateOptions;
 
 import cj.lns.chip.sos.cube.framework.ICube;
 import cj.lns.chip.sos.cube.framework.IDocument;
@@ -16,17 +17,18 @@ import cj.lns.chip.sos.cube.framework.IQuery;
 import cj.netos.fsbank.args.CashoutBill;
 import cj.netos.fsbank.args.DepositBill;
 import cj.netos.fsbank.args.ExchangeBill;
+import cj.netos.fsbank.args.IndividualAccount;
 import cj.netos.fsbank.bs.IFSBankPropertiesBS;
 import cj.netos.fsbank.bs.IFSBankTransactionBS;
-import cj.netos.fsbank.bs.IPersonalAssetBS;
+import cj.netos.fsbank.bs.IFSBankIndividualAccountAssetBS;
 import cj.netos.fsbank.plugin.FSBAEngine.util.BigDecimalConstants;
 import cj.studio.ecm.IServiceSite;
 import cj.studio.ecm.annotation.CjService;
 import cj.studio.ecm.annotation.CjServiceRef;
 import cj.studio.ecm.annotation.CjServiceSite;
 
-@CjService(name = "personalAssetBS")
-public class PersonalAssetBS implements IPersonalAssetBS, BigDecimalConstants {
+@CjService(name = "fSBankIndividualAccountAssetBS")
+public class FSBankIndividualAccountAssetBS implements IFSBankIndividualAccountAssetBS, BigDecimalConstants {
 	@CjServiceSite
 	IServiceSite site;
 	ICube cubeBank;
@@ -50,7 +52,7 @@ public class PersonalAssetBS implements IPersonalAssetBS, BigDecimalConstants {
 	@Override
 	public long cashoutBillCount(String bank, String cashoutor, String identity) {
 		return getBankCube(bank).tupleCount(IFSBankTransactionBS.TABLE_Cashouts,
-				String.format("{'tuple.cashoutor':'%s','tuple.identity':'%s'}", cashoutor,identity));
+				String.format("{'tuple.cashoutor':'%s','tuple.identity':'%s'}", cashoutor, identity));
 	}
 
 	@Override
@@ -75,10 +77,12 @@ public class PersonalAssetBS implements IPersonalAssetBS, BigDecimalConstants {
 	}
 
 	@Override
-	public List<CashoutBill> pageCashoutBill(String bank, String cashoutor, String identity, int currPage, int pageSize) {
+	public List<CashoutBill> pageCashoutBill(String bank, String cashoutor, String identity, int currPage,
+			int pageSize) {
 		String cjql = String.format(
-				"select {'tuple':'*'}.limit(%s).skip(%s) from tuple %s %s where {'tuple.cashoutor':'%s','tuple.identity':'%s'}", pageSize,
-				currPage, IFSBankTransactionBS.TABLE_Cashouts, CashoutBill.class.getName(), cashoutor,identity);
+				"select {'tuple':'*'}.limit(%s).skip(%s) from tuple %s %s where {'tuple.cashoutor':'%s','tuple.identity':'%s'}",
+				pageSize, currPage, IFSBankTransactionBS.TABLE_Cashouts, CashoutBill.class.getName(), cashoutor,
+				identity);
 		IQuery<CashoutBill> q = getBankCube(bank).createQuery(cjql);
 		List<CashoutBill> list = new ArrayList<>();
 		List<IDocument<CashoutBill>> docs = q.getResultList();
@@ -242,7 +246,8 @@ public class PersonalAssetBS implements IPersonalAssetBS, BigDecimalConstants {
 	@Override
 	public BigDecimal totalCashoutReqAmount(String bank, String cashoutor, String identity) {
 		List<Bson> pipeline = Arrays.asList(
-				Document.parse(String.format("{$match:{'tuple.cashoutor':'%s','tuple.identity':'%s'}}", cashoutor,identity)),
+				Document.parse(
+						String.format("{$match:{'tuple.cashoutor':'%s','tuple.identity':'%s'}}", cashoutor, identity)),
 				Document.parse("{$group : {_id : null, totalCashoutReqAmount : {$sum : \"$tuple.reqAmount\"}}}"));
 		AggregateIterable<Document> it = getBankCube(bank).aggregate(IFSBankTransactionBS.TABLE_Cashouts, pipeline);
 		BigDecimal ret = null;
@@ -257,7 +262,8 @@ public class PersonalAssetBS implements IPersonalAssetBS, BigDecimalConstants {
 	@Override
 	public BigDecimal totalCashoutResAmount(String bank, String cashoutor, String identity) {
 		List<Bson> pipeline = Arrays.asList(
-				Document.parse(String.format("{$match:{'tuple.cashoutor':'%s','tuple.identity':'%s'}}", cashoutor,identity)),
+				Document.parse(
+						String.format("{$match:{'tuple.cashoutor':'%s','tuple.identity':'%s'}}", cashoutor, identity)),
 				Document.parse("{$group : {_id : null, totalCashoutResAmount : {$sum : \"$tuple.resAmount\"}}}"));
 		AggregateIterable<Document> it = getBankCube(bank).aggregate(IFSBankTransactionBS.TABLE_Cashouts, pipeline);
 		BigDecimal ret = null;
@@ -271,8 +277,10 @@ public class PersonalAssetBS implements IPersonalAssetBS, BigDecimalConstants {
 
 	@Override
 	public BigDecimal totalCashoutPoundageAmount(String bank, String cashoutor, String identity) {
-		List<Bson> pipeline = Arrays
-				.asList(Document.parse(String.format("{$match:{'tuple.cashoutor':'%s','tuple.identity':'%s'}}", cashoutor,identity)), Document.parse(
+		List<Bson> pipeline = Arrays.asList(
+				Document.parse(
+						String.format("{$match:{'tuple.cashoutor':'%s','tuple.identity':'%s'}}", cashoutor, identity)),
+				Document.parse(
 						"{$group : {_id : null, totalCashoutPoundageAmount : {$sum : \"$tuple.poundageAmount\"}}}"));
 		AggregateIterable<Document> it = getBankCube(bank).aggregate(IFSBankTransactionBS.TABLE_Cashouts, pipeline);
 		BigDecimal ret = null;
@@ -286,8 +294,7 @@ public class PersonalAssetBS implements IPersonalAssetBS, BigDecimalConstants {
 
 	@Override
 	public BigDecimal totalCashoutReqAmountByIdentity(String bank, String identity) {
-		List<Bson> pipeline = Arrays.asList(
-				Document.parse(String.format("{$match:{'tuple.identity':'%s'}}", identity)),
+		List<Bson> pipeline = Arrays.asList(Document.parse(String.format("{$match:{'tuple.identity':'%s'}}", identity)),
 				Document.parse("{$group : {_id : null, totalCashoutReqAmount : {$sum : \"$tuple.reqAmount\"}}}"));
 		AggregateIterable<Document> it = getBankCube(bank).aggregate(IFSBankTransactionBS.TABLE_Cashouts, pipeline);
 		BigDecimal ret = null;
@@ -301,8 +308,7 @@ public class PersonalAssetBS implements IPersonalAssetBS, BigDecimalConstants {
 
 	@Override
 	public BigDecimal totalCashoutResAmountByIdentity(String bank, String identity) {
-		List<Bson> pipeline = Arrays.asList(
-				Document.parse(String.format("{$match:{'tuple.identity':'%s'}}", identity)),
+		List<Bson> pipeline = Arrays.asList(Document.parse(String.format("{$match:{'tuple.identity':'%s'}}", identity)),
 				Document.parse("{$group : {_id : null, totalCashoutResAmount : {$sum : \"$tuple.resAmount\"}}}"));
 		AggregateIterable<Document> it = getBankCube(bank).aggregate(IFSBankTransactionBS.TABLE_Cashouts, pipeline);
 		BigDecimal ret = null;
@@ -316,8 +322,8 @@ public class PersonalAssetBS implements IPersonalAssetBS, BigDecimalConstants {
 
 	@Override
 	public BigDecimal totalCashoutPoundageAmountByIdentity(String bank, String identity) {
-		List<Bson> pipeline = Arrays
-				.asList(Document.parse(String.format("{$match:{'tuple.identity':'%s'}}", identity)), Document.parse(
+		List<Bson> pipeline = Arrays.asList(Document.parse(String.format("{$match:{'tuple.identity':'%s'}}", identity)),
+				Document.parse(
 						"{$group : {_id : null, totalCashoutPoundageAmount : {$sum : \"$tuple.poundageAmount\"}}}"));
 		AggregateIterable<Document> it = getBankCube(bank).aggregate(IFSBankTransactionBS.TABLE_Cashouts, pipeline);
 		BigDecimal ret = null;
@@ -329,4 +335,25 @@ public class PersonalAssetBS implements IPersonalAssetBS, BigDecimalConstants {
 		return ret;
 	}
 
+	@Override
+	public BigDecimal boudBalance(String bank, String user) {
+		String cjql = String.format("select {'tuple':'*'} from tuple %s %s where {'tuple.user':'%s'}",
+				IFSBankIndividualAccountAssetBS.TABLE_IndividualAccount, IndividualAccount.class.getName(), user);
+		IQuery<IndividualAccount> q = getBankCube(bank).createQuery(cjql);
+		IDocument<IndividualAccount> doc = q.getSingleResult();
+		if (doc == null)
+			return new BigDecimal(0);
+		return doc.tuple().getBoudBalance();
+	}
+
+	@Override
+	public void updateBoundBalance(String bank,String user,BigDecimal balance) {
+		ICube cube = getBankCube(bank);
+		Bson filter = Document.parse(String.format("{'tuple.user':'%s'}",user));
+		Bson update = Document.parse(String.format("{'$set':{'tuple.user':'%s','tuple.boudBalance':%s}}",user, balance));
+		UpdateOptions uo = new UpdateOptions();
+		uo.upsert(true);
+		cube.updateDocOne(IFSBankIndividualAccountAssetBS.TABLE_IndividualAccount, filter, update, uo);
+
+	}
 }

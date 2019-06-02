@@ -7,7 +7,9 @@ import cj.netos.fsbank.args.CashoutBill;
 import cj.netos.fsbank.args.DepositBill;
 import cj.netos.fsbank.args.ExchangeBill;
 
-public interface IPersonalAssetBS {
+public interface IFSBankIndividualAccountAssetBS {
+	static String TABLE_IndividualAccount = "individual.account";
+
 	long depositBillCount(String bank, String depositor);
 
 	long cashoutBillCount(String bank, String cashoutor, String identity);
@@ -49,4 +51,8 @@ public interface IPersonalAssetBS {
 	BigDecimal totalCashoutResAmountByIdentity(String bank, String identity);
 
 	BigDecimal totalCashoutPoundageAmountByIdentity(String bank, String identity);
+
+	BigDecimal boudBalance(String bank, String user);
+
+	void updateBoundBalance(String bank,String user,BigDecimal balance);
 }

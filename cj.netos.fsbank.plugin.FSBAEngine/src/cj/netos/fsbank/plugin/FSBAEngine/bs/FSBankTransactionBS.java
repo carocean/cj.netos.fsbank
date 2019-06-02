@@ -10,6 +10,7 @@ import cj.netos.fsbank.args.DepositBill;
 import cj.netos.fsbank.args.ExchangeBill;
 import cj.netos.fsbank.args.SepareteBill;
 import cj.netos.fsbank.bs.IFSBankBalanceBS;
+import cj.netos.fsbank.bs.IFSBankIndividualAccountAssetBS;
 import cj.netos.fsbank.bs.IFSBankPropertiesBS;
 import cj.netos.fsbank.bs.IFSBankTransactionBS;
 import cj.netos.fsbank.plugin.FSBAEngine.util.BigDecimalConstants;
@@ -28,6 +29,8 @@ public class FSBankTransactionBS implements IFSBankTransactionBS, BigDecimalCons
 	IFSBankBalanceBS fSBankBalance;
 	@CjServiceRef
 	IFSBankPropertiesBS fSBankPropertiesBS;
+	@CjServiceRef
+	IFSBankIndividualAccountAssetBS fSBankIndividualAccountAssetBS;
 	ICube cubeBank;
 
 	private ICube getBankCube(String bank) {
@@ -69,7 +72,7 @@ public class FSBankTransactionBS implements IFSBankTransactionBS, BigDecimalCons
 
 		BigDecimal bondQuantities = sbill.getBondAmount().divide(bill.getCurrBondPrice(), scale, roundingMode);
 		sbill.setBondQuantities(bondQuantities);
-
+		
 		sbill.setReserveAmount(amount.multiply(reserveRate).setScale(scale, roundingMode));
 
 		sbill.setFreeAmount(amount.multiply(freeRate).setScale(scale, roundingMode));
@@ -112,6 +115,9 @@ public class FSBankTransactionBS implements IFSBankTransactionBS, BigDecimalCons
 		ICube cubeBank = getBankCube(bank);
 		String id = cubeBank.saveDoc(TABLE_Deposits, new TupleDocument<>(bill));
 		bill.setCode(id);
+		
+		BigDecimal individual=this.fSBankIndividualAccountAssetBS.boudBalance(bank, depositor);
+		this.fSBankIndividualAccountAssetBS.updateBoundBalance(bank,depositor,bondQuantities.add(individual));
 	}
 
 	@Override
@@ -238,6 +244,9 @@ public class FSBankTransactionBS implements IFSBankTransactionBS, BigDecimalCons
 		fSBankBalance.updateBondPrice(bank, newprice);
 		bill.setNewBondPrice(newprice);
 		this.getBankCube(bank).saveDoc(TABLE_Exchanges, new TupleDocument<>(bill));
+		
+		BigDecimal individualBalance=fSBankIndividualAccountAssetBS.boudBalance(bank, exchanger);
+		this.fSBankIndividualAccountAssetBS.updateBoundBalance(bank,exchanger,individualBalance.subtract(bondQuantities));
 	}
 
 }
