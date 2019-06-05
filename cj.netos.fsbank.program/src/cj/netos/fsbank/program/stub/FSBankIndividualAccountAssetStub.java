@@ -7,13 +7,13 @@ import cj.netos.fsbank.args.CashoutBill;
 import cj.netos.fsbank.args.DepositBill;
 import cj.netos.fsbank.args.ExchangeBill;
 import cj.netos.fsbank.bs.IFSBankIndividualAccountAssetBS;
-import cj.netos.fsbank.stub.IFSBankIndividualAccountAssetStub;
+import cj.netos.fsbank.stub.IFSBankIndividualAssetStub;
 import cj.studio.ecm.annotation.CjService;
 import cj.studio.ecm.annotation.CjServiceRef;
 import cj.studio.gateway.stub.GatewayAppSiteRestStub;
 
 @CjService(name = "/asset/individualAccount.service")
-public class FSBankIndividualAccountAssetStub extends GatewayAppSiteRestStub implements IFSBankIndividualAccountAssetStub {
+public class FSBankIndividualAccountAssetStub extends GatewayAppSiteRestStub implements IFSBankIndividualAssetStub {
 	@CjServiceRef(refByName = "FSBAEngine.fSBankIndividualAccountAssetBS")
 	IFSBankIndividualAccountAssetBS fSBankIndividualAccountAssetBS;
 

@@ -13,7 +13,7 @@ import cj.studio.gateway.stub.annotation.CjStubReturn;
 import cj.studio.gateway.stub.annotation.CjStubService;
 
 @CjStubService(bindService = "/asset/individualAccount.service", usage = "个人账户资产服务")
-public interface IFSBankIndividualAccountAssetStub {
+public interface IFSBankIndividualAssetStub {
 	@CjStubMethod(usage = "用户债券余额")
 	@CjStubReturn(type = BigDecimal.class, usage = "用户的债券余额")
 	BigDecimal boudBalance(@CjStubInParameter(key = "bank", usage = "银行") String bank,
