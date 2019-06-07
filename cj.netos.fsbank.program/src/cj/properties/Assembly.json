@@ -45,6 +45,10 @@
 			extName:".jss.js"
 		}],
 		scans : [{
+					package : "cj.netos.inform",
+					extName : ".class|.json|.xml",
+					exoterical:"true"
+				},{
 					package : "cj.netos.fsbank.program",
 					extName : ".class|.json|.xml",
 					exoterical:"true"

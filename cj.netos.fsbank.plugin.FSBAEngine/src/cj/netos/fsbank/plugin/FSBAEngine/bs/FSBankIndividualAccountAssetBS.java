@@ -336,7 +336,7 @@ public class FSBankIndividualAccountAssetBS implements IFSBankIndividualAccountA
 	}
 
 	@Override
-	public BigDecimal boudBalance(String bank, String user) {
+	public BigDecimal bondBalance(String bank, String user) {
 		String cjql = String.format("select {'tuple':'*'} from tuple %s %s where {'tuple.user':'%s'}",
 				IFSBankIndividualAccountAssetBS.TABLE_IndividualAccount, IndividualAccount.class.getName(), user);
 		IQuery<IndividualAccount> q = getBankCube(bank).createQuery(cjql);

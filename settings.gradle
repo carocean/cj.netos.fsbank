@@ -1,3 +1,4 @@
+include "cj.netos.inform"
 include "cj.netos.fsbank.program"
 include "cj.netos.fsbank.main"
 include "cj.netos.fsbank.plugin.FSBAEngine"

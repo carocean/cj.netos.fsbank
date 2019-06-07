@@ -8,18 +8,35 @@ import cj.netos.fsbank.args.DepositBill;
 import cj.netos.fsbank.args.ExchangeBill;
 import cj.netos.fsbank.bs.IFSBankIndividualAccountAssetBS;
 import cj.netos.fsbank.stub.IFSBankIndividualAssetStub;
+import cj.studio.ecm.IServiceSite;
 import cj.studio.ecm.annotation.CjService;
 import cj.studio.ecm.annotation.CjServiceRef;
+import cj.studio.ecm.annotation.CjServiceSite;
 import cj.studio.gateway.stub.GatewayAppSiteRestStub;
+import cj.studio.util.reactor.Event;
+import cj.studio.util.reactor.IReactor;
 
 @CjService(name = "/asset/individualAccount.service")
-public class FSBankIndividualAccountAssetStub extends GatewayAppSiteRestStub implements IFSBankIndividualAssetStub {
+public class FSBankIndividualAssetStub extends GatewayAppSiteRestStub implements IFSBankIndividualAssetStub {
 	@CjServiceRef(refByName = "FSBAEngine.fSBankIndividualAccountAssetBS")
 	IFSBankIndividualAccountAssetBS fSBankIndividualAccountAssetBS;
+	@CjServiceSite
+	IServiceSite site;
+	IReactor reactor;
 
+	protected IReactor getReactor() {
+		if (reactor == null) {
+			reactor = (IReactor) site.getService("$.reactor");
+		}
+		return reactor;
+	}
 	@Override
-	public BigDecimal boudBalance(String bank, String user) {
-		return fSBankIndividualAccountAssetBS.boudBalance(bank,user);
+	public void getBondBalance(String bank, String user,String informAddress) {
+		IReactor reactor = getReactor();
+		Event e = new Event(bank, "individual.getBondBalance");
+		e.getParameters().put("user", user);
+		e.getParameters().put("address",informAddress);
+		reactor.input(e);
 	}
 	@Override
 	public long depositBillCount(String bank, String depositor) {

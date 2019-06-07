@@ -116,7 +116,7 @@ public class FSBankTransactionBS implements IFSBankTransactionBS, BigDecimalCons
 		String id = cubeBank.saveDoc(TABLE_Deposits, new TupleDocument<>(bill));
 		bill.setCode(id);
 		
-		BigDecimal individual=this.fSBankIndividualAccountAssetBS.boudBalance(bank, depositor);
+		BigDecimal individual=this.fSBankIndividualAccountAssetBS.bondBalance(bank, depositor);
 		this.fSBankIndividualAccountAssetBS.updateBoundBalance(bank,depositor,bondQuantities.add(individual));
 	}
 
@@ -245,7 +245,7 @@ public class FSBankTransactionBS implements IFSBankTransactionBS, BigDecimalCons
 		bill.setNewBondPrice(newprice);
 		this.getBankCube(bank).saveDoc(TABLE_Exchanges, new TupleDocument<>(bill));
 		
-		BigDecimal individualBalance=fSBankIndividualAccountAssetBS.boudBalance(bank, exchanger);
+		BigDecimal individualBalance=fSBankIndividualAccountAssetBS.bondBalance(bank, exchanger);
 		this.fSBankIndividualAccountAssetBS.updateBoundBalance(bank,exchanger,individualBalance.subtract(bondQuantities));
 	}
 

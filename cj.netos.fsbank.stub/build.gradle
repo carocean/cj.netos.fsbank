@@ -19,8 +19,7 @@ sourceSets {
 
 dependencies {
 	compile fileTree('../global/runtime')
-	compile fileTree('src/cj/refembeds')
-	compile fileTree('src/cj/references')
+	compile project(':cj.netos.inform');
 }
 
  task releaseToProgram(type: Copy) {

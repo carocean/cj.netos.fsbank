@@ -97,6 +97,9 @@ task release(type: Copy) {
 }
 release.dependsOn ":cj.netos.fsbank.stub:release"
 release.dependsOn ":cj.netos.fsbank.program:release"
+release.dependsOn ":cj.netos.inform:release"
 release.dependsOn ":cj.netos.fsbank.plugin.FSBAEngine:release"
+tasks.getByPath(':cj.netos.fsbank.plugin.FSBAEngine:release').mustRunAfter tasks.getByPath(':cj.netos.inform:release')
 tasks.getByPath(':cj.netos.fsbank.program:release').mustRunAfter tasks.getByPath(':cj.netos.fsbank.stub:release')
+
 

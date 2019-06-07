@@ -22,6 +22,7 @@ dependencies {
 	compile group: 'cj.studio.backend.uc', name: 'cj.studio.backend.uc.stub', version: ref_cj_studio_backend_uc_version
 	compile group: 'cj.studio.gateway2', name: 'cj.studio.orm.mongodb', version: ref_cj_studio_orm_mongodb_version
 	compile group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
+	compile project(':cj.netos.inform');
 	compile project(':cj.netos.fsbank.stub');
 	compile fileTree('../global/runtime')
 	compile fileTree('src/cj/refembeds')

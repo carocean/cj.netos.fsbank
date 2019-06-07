@@ -1,48 +1,72 @@
 package cj.netos.fsbank.program.stub;
 
-import java.math.BigDecimal;
-
-import cj.netos.fsbank.args.Balance;
-import cj.netos.fsbank.bs.IFSBankBalanceBS;
 import cj.netos.fsbank.stub.IFSBankBalanceStub;
+import cj.studio.ecm.IServiceSite;
 import cj.studio.ecm.annotation.CjService;
-import cj.studio.ecm.annotation.CjServiceRef;
+import cj.studio.ecm.annotation.CjServiceSite;
 import cj.studio.gateway.stub.GatewayAppSiteRestStub;
+import cj.studio.util.reactor.Event;
+import cj.studio.util.reactor.IReactor;
 
 @CjService(name = "/balance.service")
 public class FSBankBalancesStub extends GatewayAppSiteRestStub implements IFSBankBalanceStub {
-	@CjServiceRef(refByName = "FSBAEngine.fSBankBalance")
-	IFSBankBalanceBS fSBankBalance;
-
-	@Override
-	public Balance loadBalance(String bank) {
-		return fSBankBalance.loadBalance(bank);
+	@CjServiceSite
+	IServiceSite site;
+	IReactor reactor;
+	
+	protected IReactor getReactor() {
+		if (reactor == null) {
+			reactor = (IReactor) site.getService("$.reactor");
+		}
+		return reactor;
 	}
 
 	@Override
-	public BigDecimal getBondPrice(String bank) {
-		return fSBankBalance.getBondPrice(bank);
-	}
-
-
-	@Override
-	public BigDecimal getBondQuantitiesBalance(String bank) {
-		return fSBankBalance.getBondQuantitiesBalance(bank);
+	public void loadBalance(String bank, String informAddress) {
+		IReactor reactor = getReactor();
+		Event e = new Event(bank, "balance.loadBalance");
+		e.getParameters().put("address", informAddress);
+		reactor.input(e);
 	}
 
 	@Override
-	public BigDecimal getFreeAmountBalance(String bank) {
-		return fSBankBalance.getFreeAmountBalance(bank);
+	public void getBondPrice(String bank, String informAddress) {
+		IReactor reactor = getReactor();
+		Event e = new Event(bank, "balance.getBondPrice");
+		e.getParameters().put("address", informAddress);
+		reactor.input(e);
 	}
 
 	@Override
-	public BigDecimal getTailAmountBalance(String bank) {
-		return fSBankBalance.getTailAmountBalance(bank);
+	public void getBondQuantitiesBalance(String bank, String informAddress) {
+		IReactor reactor = getReactor();
+		Event e = new Event(bank, "balance.getBondQuantitiesBalance");
+		e.getParameters().put("address", informAddress);
+		reactor.input(e);
 	}
 
 	@Override
-	public BigDecimal getFreezeAmountBalance(String bank) {
-		return fSBankBalance.getFreezeAmountBalance(bank);
+	public void getFreeAmountBalance(String bank, String informAddress) {
+		IReactor reactor = getReactor();
+		Event e = new Event(bank, "balance.getFreeAmountBalance");
+		e.getParameters().put("address", informAddress);
+		reactor.input(e);
+	}
+
+	@Override
+	public void getTailAmountBalance(String bank, String informAddress) {
+		IReactor reactor = getReactor();
+		Event e = new Event(bank, "balance.getTailAmountBalance");
+		e.getParameters().put("address", informAddress);
+		reactor.input(e);
+	}
+
+	@Override
+	public void getFreezeAmountBalance(String bank, String informAddress) {
+		IReactor reactor = getReactor();
+		Event e = new Event(bank, "balance.getFreezeAmountBalance");
+		e.getParameters().put("address", informAddress);
+		reactor.input(e);
 	}
 
 }
