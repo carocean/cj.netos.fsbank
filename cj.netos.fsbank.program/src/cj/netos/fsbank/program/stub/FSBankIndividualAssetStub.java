@@ -1,25 +1,16 @@
 package cj.netos.fsbank.program.stub;
 
-import java.math.BigDecimal;
-import java.util.List;
-
-import cj.netos.fsbank.args.CashoutBill;
-import cj.netos.fsbank.args.DepositBill;
-import cj.netos.fsbank.args.ExchangeBill;
-import cj.netos.fsbank.bs.IFSBankIndividualAccountAssetBS;
 import cj.netos.fsbank.stub.IFSBankIndividualAssetStub;
 import cj.studio.ecm.IServiceSite;
 import cj.studio.ecm.annotation.CjService;
-import cj.studio.ecm.annotation.CjServiceRef;
 import cj.studio.ecm.annotation.CjServiceSite;
 import cj.studio.gateway.stub.GatewayAppSiteRestStub;
 import cj.studio.util.reactor.Event;
 import cj.studio.util.reactor.IReactor;
 
+//个人资产查询交易
 @CjService(name = "/asset/individualAccount.service")
 public class FSBankIndividualAssetStub extends GatewayAppSiteRestStub implements IFSBankIndividualAssetStub {
-	@CjServiceRef(refByName = "FSBAEngine.fSBankIndividualAccountAssetBS")
-	IFSBankIndividualAccountAssetBS fSBankIndividualAccountAssetBS;
 	@CjServiceSite
 	IServiceSite site;
 	IReactor reactor;
@@ -30,117 +21,218 @@ public class FSBankIndividualAssetStub extends GatewayAppSiteRestStub implements
 		}
 		return reactor;
 	}
+
 	@Override
-	public void getBondBalance(String bank, String user,String informAddress) {
+	public void getBondBalance(String bank, String user, String informAddress) {
 		IReactor reactor = getReactor();
 		Event e = new Event(bank, "individual.getBondBalance");
 		e.getParameters().put("user", user);
-		e.getParameters().put("address",informAddress);
+		e.getParameters().put("address", informAddress);
 		reactor.input(e);
 	}
+
 	@Override
-	public long depositBillCount(String bank, String depositor) {
-		return fSBankIndividualAccountAssetBS.depositBillCount(bank, depositor);
+	public void depositBillCount(String bank, String depositor, String informAddress) {
+		IReactor reactor = getReactor();
+		Event e = new Event(bank, "individual.depositBillCount");
+		e.getParameters().put("depositor", depositor);
+		e.getParameters().put("address", informAddress);
+		reactor.input(e);
 	}
 
 	@Override
-	public long cashoutBillCount(String bank, String cashoutor, String identity) {
-		return fSBankIndividualAccountAssetBS.cashoutBillCount(bank, cashoutor,identity);
+	public void cashoutBillCount(String bank, String cashoutor, String identity, String informAddress) {
+		IReactor reactor = getReactor();
+		Event e = new Event(bank, "individual.cashoutBillCount");
+		e.getParameters().put("cashoutor", cashoutor);
+		e.getParameters().put("identity", identity);
+		e.getParameters().put("address", informAddress);
+		reactor.input(e);
 	}
 
 	@Override
-	public long exchangeBillCount(String bank, String exchanger) {
-		return fSBankIndividualAccountAssetBS.exchangeBillCount(bank, exchanger);
+	public void exchangeBillCount(String bank, String exchanger, String informAddress) {
+		IReactor reactor = getReactor();
+		Event e = new Event(bank, "individual.exchangeBillCount");
+		e.getParameters().put("exchanger", exchanger);
+		e.getParameters().put("address", informAddress);
+		reactor.input(e);
 	}
 
 	@Override
-	public List<DepositBill> pageDepositBill(String bank, String depositor, int currPage, int pageSize) {
-		return fSBankIndividualAccountAssetBS.pageDepositBill(bank, depositor, currPage, pageSize);
+	public void pageDepositBill(String bank, String depositor, int currPage, int pageSize, String informAddress) {
+		IReactor reactor = getReactor();
+		Event e = new Event(bank, "individual.pageDepositBill");
+		e.getParameters().put("depositor", depositor);
+		e.getParameters().put("currPage", currPage);
+		e.getParameters().put("pageSize", pageSize);
+		e.getParameters().put("address", informAddress);
+		reactor.input(e);
 	}
 
 	@Override
-	public List<CashoutBill> pageCashoutBill(String bank, String cashoutor, String identity, int currPage, int pageSize) {
-		return fSBankIndividualAccountAssetBS.pageCashoutBill(bank, cashoutor,identity, currPage, pageSize);
+	public void pageCashoutBill(String bank, String cashoutor, String identity, int currPage, int pageSize,
+			String informAddress) {
+		IReactor reactor = getReactor();
+		Event e = new Event(bank, "individual.pageCashoutBill");
+		e.getParameters().put("cashoutor", cashoutor);
+		e.getParameters().put("identity", identity);
+		e.getParameters().put("currPage", currPage);
+		e.getParameters().put("pageSize", pageSize);
+		e.getParameters().put("address", informAddress);
+		reactor.input(e);
 	}
 
 	@Override
-	public List<ExchangeBill> pageExchangeBill(String bank, String exchanger, int currPage, int pageSize) {
-		return fSBankIndividualAccountAssetBS.pageExchangeBill(bank, exchanger, currPage, pageSize);
+	public void pageExchangeBill(String bank, String exchanger, int currPage, int pageSize, String informAddress) {
+		IReactor reactor = getReactor();
+		Event e = new Event(bank, "individual.pageExchangeBill");
+		e.getParameters().put("exchanger", exchanger);
+		e.getParameters().put("currPage", currPage);
+		e.getParameters().put("pageSize", pageSize);
+		e.getParameters().put("address", informAddress);
+		reactor.input(e);
 	}
 
 	@Override
-	public List<CashoutBill> pageCashoutBillByIdentity(String bank, String identity, int currPage, int pageSize) {
-		return fSBankIndividualAccountAssetBS.pageCashoutBillByIdentity(bank, identity, currPage, pageSize);
+	public void pageCashoutBillByIdentity(String bank, String identity, int currPage, int pageSize,
+			String informAddress) {
+		IReactor reactor = getReactor();
+		Event e = new Event(bank, "individual.pageCashoutBillByIdentity");
+		e.getParameters().put("identity", identity);
+		e.getParameters().put("currPage", currPage);
+		e.getParameters().put("pageSize", pageSize);
+		e.getParameters().put("address", informAddress);
+		reactor.input(e);
 	}
 
 	@Override
-	public BigDecimal totalDepositBillAmount(String bank, String depositor) {
-		return fSBankIndividualAccountAssetBS.totalDepositBillAmount(bank, depositor);
+	public void totalDepositBillAmount(String bank, String depositor, String informAddress) {
+		IReactor reactor = getReactor();
+		Event e = new Event(bank, "individual.totalDepositBillAmount");
+		e.getParameters().put("depositor", depositor);
+		e.getParameters().put("address", informAddress);
+		reactor.input(e);
 	}
 
 	@Override
-	public BigDecimal totalDepositBondQuantities(String bank, String depositor) {
-		return fSBankIndividualAccountAssetBS.totalDepositBondQuantities(bank, depositor);
+	public void totalDepositBondQuantities(String bank, String depositor, String informAddress) {
+		IReactor reactor = getReactor();
+		Event e = new Event(bank, "individual.totalDepositBondQuantities");
+		e.getParameters().put("depositor", depositor);
+		e.getParameters().put("address", informAddress);
+		reactor.input(e);
 	}
 
 	@Override
-	public BigDecimal totalDepositBondAmount(String bank, String depositor) {
-		return fSBankIndividualAccountAssetBS.totalDepositBondAmount(bank, depositor);
+	public void totalDepositBondAmount(String bank, String depositor, String informAddress) {
+		IReactor reactor = getReactor();
+		Event e = new Event(bank, "individual.totalDepositBondAmount");
+		e.getParameters().put("depositor", depositor);
+		e.getParameters().put("address", informAddress);
+		reactor.input(e);
 	}
 
 	@Override
-	public BigDecimal totalDepositReserveAmount(String bank, String depositor) {
-		return fSBankIndividualAccountAssetBS.totalDepositReserveAmount(bank, depositor);
+	public void totalDepositReserveAmount(String bank, String depositor, String informAddress) {
+		IReactor reactor = getReactor();
+		Event e = new Event(bank, "individual.totalDepositReserveAmount");
+		e.getParameters().put("depositor", depositor);
+		e.getParameters().put("address", informAddress);
+		reactor.input(e);
 	}
 
 	@Override
-	public BigDecimal totalDepositFreeAmount(String bank, String depositor) {
-		return fSBankIndividualAccountAssetBS.totalDepositFreeAmount(bank, depositor);
+	public void totalDepositFreeAmount(String bank, String depositor, String informAddress) {
+		IReactor reactor = getReactor();
+		Event e = new Event(bank, "individual.totalDepositFreeAmount");
+		e.getParameters().put("depositor", depositor);
+		e.getParameters().put("address", informAddress);
+		reactor.input(e);
 	}
 
 	@Override
-	public BigDecimal totalExchangeBondQuantities(String bank, String exchanger) {
-		return fSBankIndividualAccountAssetBS.totalExchangeBondQuantities(bank, exchanger);
+	public void totalExchangeBondQuantities(String bank, String exchanger, String informAddress) {
+		IReactor reactor = getReactor();
+		Event e = new Event(bank, "individual.totalExchangeBondQuantities");
+		e.getParameters().put("exchanger", exchanger);
+		e.getParameters().put("address", informAddress);
+		reactor.input(e);
 	}
 
 	@Override
-	public BigDecimal totalExchangeBillAmount(String bank, String exchanger) {
-		return fSBankIndividualAccountAssetBS.totalExchangeBillAmount(bank, exchanger);
+	public void totalExchangeBillAmount(String bank, String exchanger, String informAddress) {
+		IReactor reactor = getReactor();
+		Event e = new Event(bank, "individual.totalExchangeBillAmount");
+		e.getParameters().put("exchanger", exchanger);
+		e.getParameters().put("address", informAddress);
+		reactor.input(e);
 	}
 
 	@Override
-	public BigDecimal totalExchangeTailAmount(String bank, String exchanger) {
-		return fSBankIndividualAccountAssetBS.totalExchangeTailAmount(bank, exchanger);
+	public void totalExchangeTailAmount(String bank, String exchanger, String informAddress) {
+		IReactor reactor = getReactor();
+		Event e = new Event(bank, "individual.totalExchangeTailAmount");
+		e.getParameters().put("exchanger", exchanger);
+		e.getParameters().put("address", informAddress);
+		reactor.input(e);
 	}
 
 	@Override
-	public BigDecimal totalCashoutReqAmount(String bank, String cashoutor, String identity) {
-		return fSBankIndividualAccountAssetBS.totalCashoutReqAmount(bank, cashoutor,identity);
+	public void totalCashoutReqAmount(String bank, String cashoutor, String identity, String informAddress) {
+		IReactor reactor = getReactor();
+		Event e = new Event(bank, "individual.totalCashoutReqAmount");
+		e.getParameters().put("cashoutor", cashoutor);
+		e.getParameters().put("identity", identity);
+		e.getParameters().put("address", informAddress);
+		reactor.input(e);
 	}
 
 	@Override
-	public BigDecimal totalCashoutResAmount(String bank, String cashoutor, String identity) {
-		return fSBankIndividualAccountAssetBS.totalCashoutResAmount(bank, cashoutor,identity);
+	public void totalCashoutResAmount(String bank, String cashoutor, String identity, String informAddress) {
+		IReactor reactor = getReactor();
+		Event e = new Event(bank, "individual.totalCashoutResAmount");
+		e.getParameters().put("cashoutor", cashoutor);
+		e.getParameters().put("identity", identity);
+		e.getParameters().put("address", informAddress);
+		reactor.input(e);
 	}
 
 	@Override
-	public BigDecimal totalCashoutPoundageAmount(String bank, String cashoutor,String identity) {
-		return fSBankIndividualAccountAssetBS.totalCashoutPoundageAmount(bank, cashoutor,identity);
+	public void totalCashoutPoundageAmount(String bank, String cashoutor, String identity, String informAddress) {
+		IReactor reactor = getReactor();
+		Event e = new Event(bank, "individual.totalCashoutPoundageAmount");
+		e.getParameters().put("cashoutor", cashoutor);
+		e.getParameters().put("identity", identity);
+		e.getParameters().put("address", informAddress);
+		reactor.input(e);
 	}
 
 	@Override
-	public BigDecimal totalCashoutReqAmountByIdentity(String bank, String identity) {
-		return fSBankIndividualAccountAssetBS.totalCashoutReqAmountByIdentity(bank, identity);
+	public void totalCashoutReqAmountByIdentity(String bank, String identity, String informAddress) {
+		IReactor reactor = getReactor();
+		Event e = new Event(bank, "individual.totalCashoutReqAmountByIdentity");
+		e.getParameters().put("identity", identity);
+		e.getParameters().put("address", informAddress);
+		reactor.input(e);
 	}
 
 	@Override
-	public BigDecimal totalCashoutResAmountByIdentity(String bank, String identity) {
-		return fSBankIndividualAccountAssetBS.totalCashoutResAmountByIdentity(bank, identity);
+	public void totalCashoutResAmountByIdentity(String bank, String identity, String informAddress) {
+		IReactor reactor = getReactor();
+		Event e = new Event(bank, "individual.totalCashoutResAmountByIdentity");
+		e.getParameters().put("identity", identity);
+		e.getParameters().put("address", informAddress);
+		reactor.input(e);
 	}
 
 	@Override
-	public BigDecimal totalCashoutPoundageAmountByIdentity(String bank, String identity) {
-		return fSBankIndividualAccountAssetBS.totalCashoutPoundageAmountByIdentity(bank, identity);
+	public void totalCashoutPoundageAmountByIdentity(String bank, String identity, String informAddress) {
+		IReactor reactor = getReactor();
+		Event e = new Event(bank, "individual.totalCashoutPoundageAmountByIdentity");
+		e.getParameters().put("identity", identity);
+		e.getParameters().put("address", informAddress);
+		reactor.input(e);
 	}
 
 }
