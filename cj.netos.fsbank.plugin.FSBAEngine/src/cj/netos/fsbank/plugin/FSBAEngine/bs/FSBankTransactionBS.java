@@ -119,15 +119,21 @@ public class FSBankTransactionBS implements IFSBankTransactionBS, BigDecimalCons
 		bill.setCode(id);
 		
 		BigDecimal individual=this.fSBankIndividualAccountAssetBS.bondBalance(bank, depositor);
-		this.fSBankIndividualAccountAssetBS.updateBoundBalance(bank,depositor,bondQuantities.add(individual));
+		BigDecimal individualBondQuantities=bondQuantities.add(individual);
+		this.fSBankIndividualAccountAssetBS.updateBoundBalance(bank,depositor,individualBondQuantities);
 		
 		Map<String,Object>map= new HashMap<>();
+		
 		map.put("newBondPrice", newBondPrice);
 		map.put("oldBondPrice", bondPrice);
-		map.put("bondQuantitiesBalance", bondQuantitiesBalance);
-		map.put("freezeAmountBalance", freezeAmountBalance);
-		map.put("freeAmountBalance", freeAmountBalance);
-		map.put("tailAmountBalance", tailAmountBalance);
+		map.put("amount",amount);
+		map.put("bondAmount", bill.getSepareteBill().getBondAmount());
+		map.put("bondQuantities", bill.getSepareteBill().getBondQuantities());
+		map.put("freeAmount", bill.getSepareteBill().getFreeAmount());
+		map.put("reserveAmount", bill.getSepareteBill().getReserveAmount());
+		map.put("freeRate", bill.getSepareteBill().getFreeRate());
+		map.put("reserveRate", bill.getSepareteBill().getReserveRate());
+		map.put("balance.individualBondQuantities", individualBondQuantities);
 		return map;
 	}
 

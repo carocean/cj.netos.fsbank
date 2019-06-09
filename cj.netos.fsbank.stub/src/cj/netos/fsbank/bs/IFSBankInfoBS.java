@@ -3,6 +3,7 @@ package cj.netos.fsbank.bs;
 import java.util.List;
 
 import cj.netos.fsbank.args.BankInfo;
+import cj.studio.ecm.net.CircuitException;
 
 public interface IFSBankInfoBS {
 	static String TABLE_BANK_INFO = "banks";
@@ -22,4 +23,6 @@ public interface IFSBankInfoBS {
 	void updateBankPresident(String bank, String president);
 
 	void updateBankCompany(String bank, String company);
+
+	boolean isExpired(String bank) throws CircuitException;
 }

@@ -2,7 +2,7 @@ package cj.netos.fsbank.program;
 
 import cj.netos.fsbank.args.BState;
 import cj.netos.fsbank.args.BankState;
-import cj.netos.fsbank.bs.IFSBankLicenseBS;
+import cj.netos.fsbank.bs.IFSBankInfoBS;
 import cj.netos.fsbank.bs.IFSBankStateBS;
 import cj.netos.fsbank.stub.IFSBankManagerStub;
 import cj.studio.ecm.Scope;
@@ -19,8 +19,8 @@ public class FSBankStateVavle implements IAnnotationInputValve {
 
 	@CjServiceRef(refByName = "FSBAEngine.fSBankStateBS")
 	IFSBankStateBS fSBankStateBS;
-	@CjServiceRef(refByName = "FSBAEngine.fSBankLicenseBS")
-	IFSBankLicenseBS fSBankLicenseBS;
+	@CjServiceRef(refByName = "FSBAEngine.fSBankInfoBS")
+	IFSBankInfoBS fSBankInfoBS;
 
 	@Override
 	public void onActive(String inputName, IIPipeline pipeline) throws CircuitException {
@@ -46,12 +46,12 @@ public class FSBankStateVavle implements IAnnotationInputValve {
 			pipeline.nextFlow(request, response, this);
 			return;
 		}
-		if (this.fSBankLicenseBS.isExpired(bank)) {
+		if (this.fSBankInfoBS.isExpired(bank)) {
 			BankState state = new BankState();
 			state.setBank(bank);
 			state.setCtime(System.currentTimeMillis());
 			state.setState(BState.freeze);
-			state.setDesc("牌照过期，银行已被冻结，请重新申请牌照");
+			state.setDesc("The license expires and the bank has been frozen. Please re-apply for the license. ");
 			fSBankStateBS.save(state);
 		}
 		BankState state = fSBankStateBS.getState(bank);
@@ -59,7 +59,7 @@ public class FSBankStateVavle implements IAnnotationInputValve {
 		case closed:
 		case freeze:
 		case revoke:
-			throw new CircuitException("503", String.format("银行:%s 拒绝服务，原因：%s %s", bank, state.getState(),
+			throw new CircuitException("503", String.format("Bank:%s Denial of Service, Reasons:%s %s. ", bank, state.getState(),
 					state.getDesc() == null ? "" : state.getDesc()));
 		case opened:
 			pipeline.nextFlow(request, response, this);
