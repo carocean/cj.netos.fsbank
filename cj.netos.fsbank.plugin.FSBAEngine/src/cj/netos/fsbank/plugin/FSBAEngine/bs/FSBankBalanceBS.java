@@ -11,7 +11,9 @@ import cj.lns.chip.sos.cube.framework.ICube;
 import cj.lns.chip.sos.cube.framework.IDocument;
 import cj.lns.chip.sos.cube.framework.IQuery;
 import cj.netos.fsbank.args.Balance;
+import cj.netos.fsbank.args.IndividualAccount;
 import cj.netos.fsbank.bs.IFSBankBalanceBS;
+import cj.netos.fsbank.bs.IFSBankIndividualAccountAssetBS;
 import cj.studio.ecm.IServiceSite;
 import cj.studio.ecm.annotation.CjService;
 import cj.studio.ecm.annotation.CjServiceSite;
@@ -151,6 +153,26 @@ public class FSBankBalanceBS implements IFSBankBalanceBS {
 		UpdateOptions uo = new UpdateOptions();
 		uo.upsert(true);
 		cube.updateDocOne(TABLE_NAME, filter, update, uo);
+	}
+	@Override
+	public BigDecimal getIndividualBondBalance(String bank, String user) {
+		String cjql = String.format("select {'tuple':'*'} from tuple %s %s where {'tuple.user':'%s'}",
+				IFSBankIndividualAccountAssetBS.TABLE_IndividualAccount, IndividualAccount.class.getName(), user);
+		IQuery<IndividualAccount> q = getBank(bank).createQuery(cjql);
+		IDocument<IndividualAccount> doc = q.getSingleResult();
+		if (doc == null)
+			return new BigDecimal(0);
+		return doc.tuple().getBoudBalance();
+	}
+
+	@Override
+	public void updateIndividualBoundBalance(String bank, String user, BigDecimal balance) {
+		ICube cube = getBank(bank);
+		Bson filter = Document.parse(String.format("{'tuple.user':'%s'}",user));
+		Bson update = Document.parse(String.format("{'$set':{'tuple.user':'%s','tuple.boudBalance':%s}}",user, balance));
+		UpdateOptions uo = new UpdateOptions();
+		uo.upsert(true);
+		cube.updateDocOne(IFSBankIndividualAccountAssetBS.TABLE_IndividualAccount, filter, update, uo);
 	}
 
 }

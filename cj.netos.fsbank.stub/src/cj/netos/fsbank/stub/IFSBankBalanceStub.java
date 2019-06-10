@@ -31,4 +31,9 @@ public interface IFSBankBalanceStub {
 	void getTailAmountBalance(@CjStubInParameter(key = "bank", usage = "银行") String bank,
 			@CjStubInParameter(key = "informAddress", usage = "回调通知地址，回调地址的查询串中的参数&分隔符请务必使用%26此为&的basic64编码，否则会冲突") String informAddress);
 
+	@CjStubMethod(usage = "用户债券余额")
+	void getIndividualBondBalance(@CjStubInParameter(key = "bank", usage = "银行") String bank,
+			@CjStubInParameter(key = "user", usage = "用户") String user,
+			@CjStubInParameter(key = "informAddress", usage = "回调通知地址，回调地址的查询串中的参数&分隔符请务必使用%26此为&的basic64编码，否则会冲突") String informAddress);
+
 }

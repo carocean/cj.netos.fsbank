@@ -68,5 +68,12 @@ public class FSBankBalancesStub extends GatewayAppSiteRestStub implements IFSBan
 		e.getParameters().put("address", informAddress);
 		reactor.input(e);
 	}
-
+	@Override
+	public void getIndividualBondBalance(String bank, String user, String informAddress) {
+		IReactor reactor = getReactor();
+		Event e = new Event(bank, "balance.getIndividualBondBalance");
+		e.getParameters().put("user", user);
+		e.getParameters().put("address", informAddress);
+		reactor.input(e);
+	}
 }

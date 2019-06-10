@@ -52,7 +52,4 @@ public interface IFSBankIndividualAccountAssetBS {
 
 	BigDecimal totalCashoutPoundageAmountByIdentity(String bank, String identity);
 
-	BigDecimal bondBalance(String bank, String user);
-
-	void updateBoundBalance(String bank,String user,BigDecimal balance);
 }

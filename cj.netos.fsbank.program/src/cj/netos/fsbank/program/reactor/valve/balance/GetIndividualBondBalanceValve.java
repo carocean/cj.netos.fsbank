@@ -1,10 +1,10 @@
-package cj.netos.fsbank.program.reactor.valve.individual;
+package cj.netos.fsbank.program.reactor.valve.balance;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
-import cj.netos.fsbank.bs.IFSBankIndividualAccountAssetBS;
+import cj.netos.fsbank.bs.IFSBankBalanceBS;
 import cj.netos.inform.Informer;
 import cj.studio.ecm.annotation.CjService;
 import cj.studio.ecm.annotation.CjServiceRef;
@@ -17,18 +17,17 @@ import cj.studio.util.reactor.IPipeline;
 import cj.studio.util.reactor.IValve;
 import cj.ultimate.gson2.com.google.gson.Gson;
 
-@CjService(name = "individual.getBondBalance")
-public class GetBondBalanceValve implements IValve {
+@CjService(name = "balance.getIndividualBondBalance")
+public class GetIndividualBondBalanceValve implements IValve {
 	@CjServiceRef(refByName = "$.netos.informer")
 	Informer informer;
-	@CjServiceRef(refByName = "FSBAEngine.fSBankIndividualAccountAssetBS")
-	IFSBankIndividualAccountAssetBS fSBankIndividualAccountAssetBS;
-
+	@CjServiceRef(refByName = "FSBAEngine.fSBankBalance")
+	IFSBankBalanceBS fSBankBalance;
 	@Override
 	public void flow(Event e, IPipeline pipeline) throws CircuitException {
 		String user = (String) e.getParameters().get("user");
 		String informAddress = (String) e.getParameters().get("address");
-		BigDecimal bondBalance = fSBankIndividualAccountAssetBS.bondBalance(e.getKey(), user);
+		BigDecimal bondBalance = fSBankBalance.getIndividualBondBalance(e.getKey(), user);
 		
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("bondBalance", new Gson().toJson(bondBalance));

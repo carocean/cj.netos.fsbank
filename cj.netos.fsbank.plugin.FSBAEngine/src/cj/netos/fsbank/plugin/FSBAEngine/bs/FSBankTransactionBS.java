@@ -12,7 +12,6 @@ import cj.netos.fsbank.args.DepositBill;
 import cj.netos.fsbank.args.ExchangeBill;
 import cj.netos.fsbank.args.SepareteBill;
 import cj.netos.fsbank.bs.IFSBankBalanceBS;
-import cj.netos.fsbank.bs.IFSBankIndividualAccountAssetBS;
 import cj.netos.fsbank.bs.IFSBankPropertiesBS;
 import cj.netos.fsbank.bs.IFSBankTransactionBS;
 import cj.netos.fsbank.plugin.FSBAEngine.util.BigDecimalConstants;
@@ -31,8 +30,6 @@ public class FSBankTransactionBS implements IFSBankTransactionBS, BigDecimalCons
 	IFSBankBalanceBS fSBankBalance;
 	@CjServiceRef
 	IFSBankPropertiesBS fSBankPropertiesBS;
-	@CjServiceRef
-	IFSBankIndividualAccountAssetBS fSBankIndividualAccountAssetBS;
 	ICube cubeBank;
 
 	private ICube getBankCube(String bank) {
@@ -44,7 +41,7 @@ public class FSBankTransactionBS implements IFSBankTransactionBS, BigDecimalCons
 	}
 
 	@Override
-	public Map<String,Object> depositBill(String bank, String depositor, BigDecimal amount) {
+	public Map<String, Object> depositBill(String bank, String depositor, BigDecimal amount) {
 		DepositBill bill = new DepositBill();
 		bill.setAmount(amount);
 		bill.setDepositor(depositor);
@@ -74,7 +71,7 @@ public class FSBankTransactionBS implements IFSBankTransactionBS, BigDecimalCons
 
 		BigDecimal bondQuantities = sbill.getBondAmount().divide(bill.getCurrBondPrice(), scale, roundingMode);
 		sbill.setBondQuantities(bondQuantities);
-		
+
 		sbill.setReserveAmount(amount.multiply(reserveRate).setScale(scale, roundingMode));
 
 		sbill.setFreeAmount(amount.multiply(freeRate).setScale(scale, roundingMode));
@@ -117,17 +114,17 @@ public class FSBankTransactionBS implements IFSBankTransactionBS, BigDecimalCons
 		ICube cubeBank = getBankCube(bank);
 		String id = cubeBank.saveDoc(TABLE_Deposits, new TupleDocument<>(bill));
 		bill.setCode(id);
-		
-		BigDecimal individual=this.fSBankIndividualAccountAssetBS.bondBalance(bank, depositor);
-		BigDecimal individualBondQuantities=bondQuantities.add(individual);
-		this.fSBankIndividualAccountAssetBS.updateBoundBalance(bank,depositor,individualBondQuantities);
-		
-		Map<String,Object>map= new HashMap<>();
+
+		BigDecimal individual = this.fSBankBalance.getIndividualBondBalance(bank, depositor);
+		BigDecimal individualBondQuantities = bondQuantities.add(individual);
+		this.fSBankBalance.updateIndividualBoundBalance(bank, depositor, individualBondQuantities);
+
+		Map<String, Object> map = new HashMap<>();
 		map.put("billno", bill.getCode());
 		map.put("dtime", bill.getDtime());
 		map.put("newBondPrice", newBondPrice);
 		map.put("dealBondPrice", bondPrice);
-		map.put("amount",amount);
+		map.put("amount", amount);
 		map.put("bondAmount", bill.getSepareteBill().getBondAmount());
 		map.put("bondQuantities", bill.getSepareteBill().getBondQuantities());
 		map.put("freeAmount", bill.getSepareteBill().getFreeAmount());
@@ -139,18 +136,18 @@ public class FSBankTransactionBS implements IFSBankTransactionBS, BigDecimalCons
 	}
 
 	@Override
-	public Map<String, Object> cashoutBill(String bank, String balanceType, String cashoutor, String identity, BigDecimal reqAmount,
-			String memo) {
+	public Map<String, Object> cashoutBill(String bank, String balanceType, String cashoutor, String identity,
+			BigDecimal reqAmount, String memo) {
 		if (StringUtil.isEmpty(balanceType)) {
 			throw new EcmException("余额类型为空");
 		}
-		Map<String, Object> map=null;
+		Map<String, Object> map = null;
 		switch (balanceType) {
 		case "freeBalance":
-			map=cashoutFreeBalance(bank, cashoutor, identity, reqAmount, memo);
+			map = cashoutFreeBalance(bank, cashoutor, identity, reqAmount, memo);
 			break;
 		case "tailBalance":
-			map=cashoutTailBalance(bank, cashoutor, identity, reqAmount, memo);
+			map = cashoutTailBalance(bank, cashoutor, identity, reqAmount, memo);
 			break;
 		default:
 			throw new EcmException("不支持的提现目标：" + balanceType);
@@ -158,7 +155,8 @@ public class FSBankTransactionBS implements IFSBankTransactionBS, BigDecimalCons
 		return map;
 	}
 
-	private Map<String, Object> cashoutTailBalance(String bank, String cashoutor, String identity, BigDecimal reqAmount, String memo) {
+	private Map<String, Object> cashoutTailBalance(String bank, String cashoutor, String identity, BigDecimal reqAmount,
+			String memo) {
 		BigDecimal tailAmountBalance = fSBankBalance.getTailAmountBalance(bank);
 		if (tailAmountBalance == null || tailAmountBalance.compareTo(new BigDecimal(0)) <= 0) {
 			throw new EcmException(String.format("银行:%s 无现可提", bank));
@@ -184,15 +182,15 @@ public class FSBankTransactionBS implements IFSBankTransactionBS, BigDecimalCons
 		bill.setBalanceType("tailBalance");
 		bill.setBalance(tailAmountBalance);
 		fSBankBalance.updateTailAmountBalance(bank, tailAmountBalance);
-		Map<String,Object> map=new HashMap<String, Object>();
+		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("tailAmountBalance", tailAmountBalance);
 		return map;
 	}
 
-	private Map<String, Object> cashoutFreeBalance(String bank, String cashoutor, String identity, BigDecimal reqAmount, String memo) {
+	private Map<String, Object> cashoutFreeBalance(String bank, String cashoutor, String identity, BigDecimal reqAmount,
+			String memo) {
 		BigDecimal freeAmountBalance = fSBankBalance.getFreeAmountBalance(bank);
-		if (freeAmountBalance == null
-				|| freeAmountBalance.compareTo(new BigDecimal(0)) <= 0) {
+		if (freeAmountBalance == null || freeAmountBalance.compareTo(new BigDecimal(0)) <= 0) {
 			throw new EcmException(String.format("银行:%s 无现可提", bank));
 		}
 		if (freeAmountBalance.compareTo(reqAmount) < 0) {
@@ -200,7 +198,7 @@ public class FSBankTransactionBS implements IFSBankTransactionBS, BigDecimalCons
 		}
 		int scale = bigDecimalScale(fSBankPropertiesBS, bank);
 		RoundingMode roundingMode = bigDecimalRoundingMode(fSBankPropertiesBS, bank);
-		
+
 		CashoutBill bill = new CashoutBill();
 		bill.setCashoutor(cashoutor);
 		bill.setCode(null);
@@ -217,28 +215,29 @@ public class FSBankTransactionBS implements IFSBankTransactionBS, BigDecimalCons
 		fSBankBalance.updateFreeAmountBalance(bank, freeAmountBalance);
 		String id = getBankCube(bank).saveDoc(TABLE_Cashouts, new TupleDocument<>(bill));
 		bill.setCode(id);
-		
-		Map<String,Object> map=new HashMap<String, Object>();
+
+		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("freeAmountBalance", freeAmountBalance);
 		return map;
 	}
 
 	@Override
-	public Map<String, Object>  exchangeBill(String bank, String exchanger, BigDecimal bondQuantities) {
+	public Map<String, Object> exchangeBill(String bank, String exchanger, BigDecimal bondQuantities) {
+		BigDecimal individualBondBalance = fSBankBalance.getIndividualBondBalance(bank, exchanger);
+		if (bondQuantities.compareTo(individualBondBalance) > 0) {
+			throw new EcmException(
+					String.format("用户：%s 申请承兑债券量超出存量:%s>%s", exchanger, bondQuantities, individualBondBalance));
+		}
+
 		BigDecimal price = fSBankBalance.getBondPrice(bank);
-		
 		int scale = bigDecimalScale(fSBankPropertiesBS, bank);
 		RoundingMode roundingMode = bigDecimalRoundingMode(fSBankPropertiesBS, bank);
-		
+
 		BigDecimal realFloat = bondQuantities.multiply(price).setScale(scale, roundingMode);// 实际精度
 		BigDecimal getFloat = bondQuantities.multiply(price).setScale(2, roundingMode);// 两个小数位
 		BigDecimal freezeAmountBalance = fSBankBalance.getFreezeAmountBalance(bank);
 		if (realFloat.compareTo(freezeAmountBalance) > 0) {
 			throw new EcmException("资金不足，请稍后再取");
-		}
-		BigDecimal bondQuantitiesBalance = fSBankBalance.getBondQuantitiesBalance(bank);
-		if (bondQuantities.compareTo(bondQuantitiesBalance) > 0) {
-			throw new EcmException("申请承兑债券量超出存量");
 		}
 
 		ExchangeBill bill = new ExchangeBill();
@@ -253,9 +252,10 @@ public class FSBankTransactionBS implements IFSBankTransactionBS, BigDecimalCons
 		BigDecimal tailAmountBalance = fSBankBalance.getTailAmountBalance(bank);
 		fSBankBalance.updateTailAmountBalance(bank, tailAmountBalance.add(bill.getTailAmount()));
 
+		BigDecimal bondQuantitiesBalance = fSBankBalance.getBondQuantitiesBalance(bank);
 		BigDecimal bondQuantitiesBalanceRemainer = bondQuantitiesBalance.subtract(bondQuantities);
 		fSBankBalance.updateBondQuantitiesBalance(bank, bondQuantitiesBalanceRemainer);
-		
+
 		BigDecimal freezeAmountBalanceRemainer = freezeAmountBalance.subtract(realFloat);
 		fSBankBalance.updateFreezeAmountBalance(bank, freezeAmountBalanceRemainer);
 
@@ -263,18 +263,17 @@ public class FSBankTransactionBS implements IFSBankTransactionBS, BigDecimalCons
 		if (bondQuantitiesBalanceRemainer.compareTo(new BigDecimal(0).setScale(0, roundingMode)) == 0) {// 如果债已兑换完则采用当前价格
 			newprice = price;
 		} else {
-			newprice = (freezeAmountBalanceRemainer).divide(bondQuantitiesBalanceRemainer, scale,
-					roundingMode);
+			newprice = (freezeAmountBalanceRemainer).divide(bondQuantitiesBalanceRemainer, scale, roundingMode);
 		}
 
 		fSBankBalance.updateBondPrice(bank, newprice);
 		bill.setNewBondPrice(newprice);
 		this.getBankCube(bank).saveDoc(TABLE_Exchanges, new TupleDocument<>(bill));
-		
-		BigDecimal individualBalance=fSBankIndividualAccountAssetBS.bondBalance(bank, exchanger);
-		this.fSBankIndividualAccountAssetBS.updateBoundBalance(bank,exchanger,individualBalance.subtract(bondQuantities));
-		
-		Map<String,Object>map= new HashMap<>();
+
+		BigDecimal individualBalance = fSBankBalance.getIndividualBondBalance(bank, exchanger);
+		this.fSBankBalance.updateIndividualBoundBalance(bank, exchanger, individualBalance.subtract(bondQuantities));
+
+		Map<String, Object> map = new HashMap<>();
 		map.put("billno", bill.getCode());
 		map.put("dealtime", bill.getEtime());
 		map.put("newBondPrice", newprice);

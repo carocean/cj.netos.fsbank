@@ -29,4 +29,7 @@ public interface IFSBankBalanceBS {
 
 	void updateTailAmountBalance(String bank, BigDecimal balance);
 
+	BigDecimal getIndividualBondBalance(String bank, String user);
+
+	void updateIndividualBoundBalance(String bank,String user,BigDecimal balance);
 }

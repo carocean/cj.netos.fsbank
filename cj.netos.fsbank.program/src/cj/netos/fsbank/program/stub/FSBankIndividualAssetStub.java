@@ -22,14 +22,6 @@ public class FSBankIndividualAssetStub extends GatewayAppSiteRestStub implements
 		return reactor;
 	}
 
-	@Override
-	public void getBondBalance(String bank, String user, String informAddress) {
-		IReactor reactor = getReactor();
-		Event e = new Event(bank, "individual.getBondBalance");
-		e.getParameters().put("user", user);
-		e.getParameters().put("address", informAddress);
-		reactor.input(e);
-	}
 
 	@Override
 	public void depositBillCount(String bank, String depositor, String informAddress) {
