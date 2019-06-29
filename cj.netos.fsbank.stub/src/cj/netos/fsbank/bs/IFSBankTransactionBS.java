@@ -7,7 +7,7 @@ public interface IFSBankTransactionBS {
 	static String TABLE_Deposits = "deposits";
 	static String TABLE_Cashouts = "cashouts";
 	static String TABLE_Exchanges = "exchanges";
-	Map<String,Object> depositBill(String bank, String depositor, BigDecimal amount);
+	Map<String,Object> depositBill(String bank, String depositor, BigDecimal amount,BigDecimal rebateRate);
 
 	Map<String, Object>  cashoutBill(String bank,String balanceType, String cashoutor, String identity, BigDecimal reqAmount, String memo);
 

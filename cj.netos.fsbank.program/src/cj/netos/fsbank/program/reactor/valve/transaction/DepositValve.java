@@ -28,8 +28,9 @@ public class DepositValve implements IValve {
 	public void flow(Event e, IPipeline pipeline) throws CircuitException {
 		String depositor = (String) e.getParameters().get("depositor");
 		BigDecimal amount = (BigDecimal) e.getParameters().get("amount");
+		BigDecimal rebateRate = (BigDecimal) e.getParameters().get("rebateRate");
 		String informAddress = (String) e.getParameters().get("address");
-		Map<String, Object> map =fSBankTransactionBS.depositBill(e.getKey(),depositor,amount);
+		Map<String, Object> map =fSBankTransactionBS.depositBill(e.getKey(),depositor,amount,rebateRate);
 		
 		Frame frame = informer.createFrame(informAddress, map);
 		MemoryOutputChannel oc = new MemoryOutputChannel();

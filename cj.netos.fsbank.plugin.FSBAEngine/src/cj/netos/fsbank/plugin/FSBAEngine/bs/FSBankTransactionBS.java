@@ -41,13 +41,13 @@ public class FSBankTransactionBS implements IFSBankTransactionBS, BigDecimalCons
 	}
 
 	@Override
-	public Map<String, Object> depositBill(String bank, String depositor, BigDecimal amount) {
+	public Map<String, Object> depositBill(String bank, String depositor, BigDecimal amount,BigDecimal rebateRate) {
 		DepositBill bill = new DepositBill();
 		bill.setAmount(amount);
 		bill.setDepositor(depositor);
 		bill.setCode(null);
 		bill.setDtime(System.currentTimeMillis());
-
+		
 		BigDecimal bondPrice = fSBankBalance.getBondPrice(bank);
 		if (bondPrice == null) {
 			bondPrice = ultimateBondPrice(fSBankPropertiesBS, bank);
@@ -63,7 +63,11 @@ public class FSBankTransactionBS implements IFSBankTransactionBS, BigDecimalCons
 		sbill.setBondRate(bondRate);
 		sbill.setFreeRate(freeRate);
 		sbill.setReserveRate(reserveRate);
-
+		if(rebateRate==null) {
+			rebateRate=new BigDecimal("0");
+		}
+		sbill.setRebateRate(rebateRate);//返利是相对于自由金率的比例
+		
 		int scale = bigDecimalScale(fSBankPropertiesBS, bank);
 		RoundingMode roundingMode = bigDecimalRoundingMode(fSBankPropertiesBS, bank);
 
@@ -73,11 +77,12 @@ public class FSBankTransactionBS implements IFSBankTransactionBS, BigDecimalCons
 		sbill.setBondQuantities(bondQuantities);
 
 		sbill.setReserveAmount(amount.multiply(reserveRate).setScale(scale, roundingMode));
-
-		sbill.setFreeAmount(amount.multiply(freeRate).setScale(scale, roundingMode));
-
+		BigDecimal freeAmount=amount.multiply(freeRate).setScale(scale, roundingMode);
+		BigDecimal freeAmountRemain=freeAmount.multiply(new BigDecimal("1.00").subtract(rebateRate));
+		sbill.setFreeAmount(freeAmountRemain);
+		sbill.setRebateAmount(freeAmount.subtract(freeAmountRemain));
 		bill.setTailAmount(amount.subtract(sbill.getBondAmount()).subtract(sbill.getReserveAmount())
-				.subtract(sbill.getFreeAmount()));
+				.subtract(sbill.getFreeAmount()).subtract(sbill.getRebateAmount()));
 
 		BigDecimal tailAmountBalance = fSBankBalance.getTailAmountBalance(bank);
 		if (tailAmountBalance == null) {
@@ -129,6 +134,8 @@ public class FSBankTransactionBS implements IFSBankTransactionBS, BigDecimalCons
 		map.put("bondQuantities", bill.getSepareteBill().getBondQuantities());
 		map.put("freeAmount", bill.getSepareteBill().getFreeAmount());
 		map.put("reserveAmount", bill.getSepareteBill().getReserveAmount());
+		map.put("rebateRate", bill.getSepareteBill().getRebateRate());
+		map.put("rebateAmount", bill.getSepareteBill().getRebateAmount());
 		map.put("freeRate", bill.getSepareteBill().getFreeRate());
 		map.put("reserveRate", bill.getSepareteBill().getReserveRate());
 		map.put("balance.individualBondQuantities", individualBondQuantities);

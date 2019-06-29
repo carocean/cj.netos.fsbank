@@ -24,11 +24,12 @@ public class FSBankTransactionStub extends GatewayAppSiteRestStub implements IFS
 	}
 
 	@Override
-	public void deposit(String bank, String depositor, BigDecimal amount, String informAddress) {
+	public void deposit(String bank, String depositor, BigDecimal amount,BigDecimal rebateRate, String informAddress) {
 		IReactor reactor = getReactor();
 		Event e = new Event(bank, "transaction.deposit");
 		e.getParameters().put("depositor", depositor);
 		e.getParameters().put("amount", amount);
+		e.getParameters().put("rebateRate", rebateRate);
 		e.getParameters().put("address",informAddress);
 		reactor.input(e);
 	}

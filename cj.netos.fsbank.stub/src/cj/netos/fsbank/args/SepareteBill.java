@@ -10,6 +10,14 @@ public class SepareteBill {
 	BigDecimal reserveAmount;
 	BigDecimal freeRate;
 	BigDecimal freeAmount;
+	BigDecimal rebateRate;//要求的返利率，返利率是相对于自由金率的比率
+	BigDecimal rebateAmount;//返利金
+	public BigDecimal getRebateRate() {
+		return rebateRate;
+	}
+	public void setRebateRate(BigDecimal rebateRate) {
+		this.rebateRate = rebateRate;
+	}
 	public BigDecimal getBondRate() {
 		return bondRate;
 	}
@@ -52,6 +60,11 @@ public class SepareteBill {
 	public void setFreeAmount(BigDecimal freeAmount) {
 		this.freeAmount = freeAmount;
 	}
-	
+	public BigDecimal getRebateAmount() {
+		return rebateAmount;
+	}
+	public void setRebateAmount(BigDecimal rebateAmount) {
+		this.rebateAmount = rebateAmount;
+	}
 	
 }
